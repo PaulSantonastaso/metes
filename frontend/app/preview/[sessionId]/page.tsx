@@ -160,21 +160,27 @@ function PreviewPageContent({
           />
         ) : (
           <div className="mb-3">
-            <div className="flex gap-1 overflow-hidden rounded-xl" style={{ height: 320 }}>
-              <div className="shimmer w-1/2 shrink-0" />
-              <div className="grid w-1/2 grid-cols-2 grid-rows-2 gap-1">
-                <div className="shimmer" />
-                <div className="shimmer" />
-                <div className="shimmer" />
-                <div className="shimmer" />
+                {/* Mobile skeleton — single hero */}
+                <div className="md:hidden">
+                  <div className="shimmer overflow-hidden rounded-xl" style={{ height: 260 }} />
+                </div>
+                {/* Desktop skeleton — hero + 2×2 */}
+                <div className="hidden md:flex gap-1 overflow-hidden rounded-xl" style={{ height: 360 }}>
+                  <div className="shimmer w-1/2 shrink-0" />
+                  <div className="grid w-1/2 grid-cols-2 grid-rows-2 gap-1">
+                    <div className="shimmer" />
+                    <div className="shimmer" />
+                    <div className="shimmer" />
+                    <div className="shimmer" />
+                  </div>
+                </div>
+                {/* Strip */}
+                <div className="mt-1.5 flex gap-1.5 overflow-x-auto pb-1">
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} className="shimmer h-16 w-[80px] shrink-0 rounded-md" />
+                  ))}
+                </div>
               </div>
-            </div>
-            <div className="mt-1.5 flex gap-1.5">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="shimmer h-16 w-[80px] shrink-0 rounded-md" />
-              ))}
-            </div>
-          </div>
         )}
       </div>
 
@@ -276,7 +282,9 @@ function PreviewPageContent({
         <MobileStickyBar
           variant="checkout"
           selectedOption={selectedOption}
-          onCheckout={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          sessionId={sessionId}
+          isGenerating={isGenerating}
+          onCheckout={handleCheckout}
         />
       )}
 
