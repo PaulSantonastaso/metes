@@ -413,7 +413,7 @@ def _serialize_session(session: dict) -> dict:
         "sessionId": session["session_id"],
         "status": status,
         "property": _serialize_property(session.get("extracted_details")),
-        "images": _serialize_images(
+        "images": session.get("images") or _serialize_images(
             session.get("image_intelligence"),
             session["session_id"],
             rename_result=rename_result,
@@ -574,6 +574,7 @@ async def _run_generation(session_id: str, email_tone: str):
                 original_images=session["original_images"],
             )
             results["rename_result"] = rename_result
+            results["property_images"] = session.get("analyzed_images") or []
 
         session["results"] = results
         session["generation_status"] = "complete"

@@ -265,4 +265,5 @@ async def generate_marketing_assets_service(
         "listing_details": listing_details,
         "reso_csv": reso_csv,
         "neighborhood_guide": neighborhood_guide,
+        "image_intelligence": image_intelligence,
     }
