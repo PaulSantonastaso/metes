@@ -574,6 +574,7 @@ async def _run_generation(session_id: str, email_tone: str):
                 original_images=session["original_images"],
             )
             results["rename_result"] = rename_result
+            results["property_images"] = session.get("analyzed_images") or []
 
         session["results"] = results
         session["generation_status"] = "complete"
