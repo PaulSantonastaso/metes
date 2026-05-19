@@ -12,7 +12,7 @@ Two API calls per listing run:
   1. Google Geocoding API  — address → lat/lng (~$0.005/call)
   2. Places API New        — lat/lng → nearby places per category (~$0.032/call)
 
-Total cost: ~$0.037 per listing run.
+Total cost: ~$0.049 per listing run.
 First 5,000 calls/month free on both APIs.
 
 Failure handling:
@@ -21,7 +21,8 @@ Failure handling:
 
 Place categories (fetched separately, top 3 each by popularity):
   coffee_shop, park, bakery, restaurant, supermarket,
-  yoga_studio, pilates_studio, farmers_market
+  yoga_studio, pilates_studio, farmers_market,
+  pharmacy, bank, gym
 
 No blocklist — the LLM handles curation.
 No schools, churches, hospitals, or demographic indicators.
@@ -42,7 +43,7 @@ logger = logging.getLogger(__name__)
 GEOCODING_URL = "https://maps.googleapis.com/maps/api/geocode/json"
 PLACES_NEARBY_URL = "https://places.googleapis.com/v1/places:searchNearby"
 
-SEARCH_RADIUS_METERS = 1609  # 1 mile
+SEARCH_RADIUS_METERS = 4022.5  # 2.5 mile
 
 INCLUDED_TYPES = [
     "coffee_shop",
@@ -53,10 +54,13 @@ INCLUDED_TYPES = [
     "yoga_studio",
     "pilates_studio",
     "farmers_market",
+    "pharmacy",
+    "bank",
+    "gym",
 ]
 
 MAX_PLACES_PER_TYPE = 3   # top 3 per category by popularity
-MAX_TOTAL_PLACES = 24     # 8 categories × 3 — LLM selects 3-5 from these
+MAX_TOTAL_PLACES = 33     # 11 categories × 3 — LLM selects across 4 sections
 
 
 # ---------------------------------------------------------------------------
@@ -87,7 +91,7 @@ class NeighborhoodContext:
         if not self.places:
             return ""
 
-        lines = [f"Nearby places within 1 mile of {self.address}:"]
+        lines = [f"Nearby places within 2.5 miles of {self.address}:"]
         for place in self.places:
             rating_str = f", rated {place.rating}" if place.rating else ""
             reviews_str = f", {place.review_count} reviews" if place.review_count else ""

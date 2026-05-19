@@ -2,19 +2,22 @@
 package_builder_service.py
 
 Builds a complete marketing package ZIP in memory from a pipeline results dict.
-Returns bytes that can be passed directly to Streamlit's download_button.
+Returns bytes that can be passed directly to the download endpoint.
 
 No file system writes — everything lives in memory and is garbage collected
 after the download is served.
 
 ZIP contents:
+  00_summary.txt                Agent receipt — metadata, image intel, compliance, manifest
   01_headline.txt
   02_mls_description.txt
-  03_listing_data_for_mls.txt   (tap-to-copy field reference — CSV toggled off)
-  04_social_posts.txt
-  05_email_campaign.txt
-  06_compliance_audit.txt
-  07_video_scripts.txt          (only included when ENABLE_VIDEO_SCRIPTS is True)
+  03_social_posts.txt
+  04_email_campaign.txt
+  05_compliance_audit.txt
+  06_neighborhood_insight.txt   (only included when neighborhood_guide is populated)
+  07_photo_captions.txt         (only included when rename_result is provided)
+  /photos/curated/              Top 25 photos, ranked and renamed
+  /photos/additional/           Remaining photos
 """
 
 import io
@@ -49,110 +52,6 @@ def _build_mls_description_file(res: dict) -> str:
     lines = [_format_header("MLS DESCRIPTION")]
     lines.append(mls)
     lines.append(f"\n\n[{char_count} / 950 characters]")
-    return "\n".join(lines)
-
-
-def _build_listing_data_file(res: dict) -> str:
-    """
-    Tap-to-copy field reference for manual MLS entry.
-    Replaces the RESO CSV while board-specific validation is pending.
-    Organized by category to match the order of most MLS input forms.
-    """
-    lines = [_format_header("LISTING DATA FOR MLS ENTRY")]
-    lines.append(
-        "Copy and paste each field into your MLS input form.\n"
-        "Field names match standard RESO / MLS terminology.\n"
-    )
-
-    listing_details = res.get("listing_details")
-    if not listing_details:
-        lines.append("No listing data available.")
-        return "\n".join(lines)
-
-    ld = listing_details
-
-    def field(label: str, value) -> str:
-        if value is None or value == "" or value == 0:
-            return f"  {label:<30} —"
-        return f"  {label:<30} {value}"
-
-    # --- Property Identification ---
-    lines.append(_format_section("PROPERTY IDENTIFICATION", "\n".join([
-        field("Street Address", getattr(ld, "unparsed_address", None)),
-        field("City", getattr(ld, "city", None)),
-        field("State", getattr(ld, "state_or_province", None)),
-        field("Postal Code", getattr(ld, "postal_code", None)),
-        field("County", getattr(ld, "county_or_parish", None)),
-        field("Subdivision", getattr(ld, "subdivision_name", None)),
-        field("Community", getattr(ld, "community_features", None)),
-        field("MLS Area", getattr(ld, "mls_area_major", None)),
-    ])))
-
-    # --- Listing Details ---
-    lines.append(_format_section("LISTING DETAILS", "\n".join([
-        field("List Price", f"${getattr(ld, 'list_price', None):,}" if getattr(ld, "list_price", None) else None),
-        field("Property Type", getattr(ld, "property_type", None)),
-        field("Property Sub Type", getattr(ld, "property_sub_type", None)),
-        field("Standard Status", getattr(ld, "standard_status", None)),
-        field("Listing Agreement", getattr(ld, "listing_agreement", None)),
-    ])))
-
-    # --- Structure ---
-    lines.append(_format_section("STRUCTURE", "\n".join([
-        field("Bedrooms", getattr(ld, "bedrooms_total", None)),
-        field("Bathrooms (Full)", getattr(ld, "bathrooms_full", None)),
-        field("Bathrooms (Half)", getattr(ld, "bathrooms_half", None)),
-        field("Living Area (sqft)", getattr(ld, "living_area", None)),
-        field("Lot Size (sqft)", getattr(ld, "lot_size_square_feet", None)),
-        field("Stories", getattr(ld, "stories_total", None)),
-        field("Year Built", getattr(ld, "year_built", None)),
-        field("Garage Spaces", getattr(ld, "garage_spaces", None)),
-        field("Carport Spaces", getattr(ld, "carport_spaces", None)),
-    ])))
-
-    # --- Interior ---
-    lines.append(_format_section("INTERIOR", "\n".join([
-        field("Flooring", ", ".join(getattr(ld, "flooring", None) or [])),
-        field("Interior Features", ", ".join(getattr(ld, "interior_features", None) or [])),
-        field("Appliances", ", ".join(getattr(ld, "appliances", None) or [])),
-        field("Fireplace", getattr(ld, "fireplace_yn", None)),
-        field("Cooling", ", ".join(getattr(ld, "cooling", None) or [])),
-        field("Heating", ", ".join(getattr(ld, "heating", None) or [])),
-        field("Laundry Features", ", ".join(getattr(ld, "laundry_features", None) or [])),
-    ])))
-
-    # --- Exterior ---
-    lines.append(_format_section("EXTERIOR", "\n".join([
-        field("Exterior Features", ", ".join(getattr(ld, "exterior_features", None) or [])),
-        field("Pool", getattr(ld, "pool_private_yn", None)),
-        field("Pool Features", ", ".join(getattr(ld, "pool_features", None) or [])),
-        field("Spa", getattr(ld, "spa_yn", None)),
-        field("Parking Features", ", ".join(getattr(ld, "parking_features", None) or [])),
-        field("Fencing", ", ".join(getattr(ld, "fencing", None) or [])),
-        field("Patio Features", ", ".join(getattr(ld, "patio_and_porch_features", None) or [])),
-    ])))
-
-    # --- HOA + Financial ---
-    lines.append(_format_section("HOA & FINANCIAL", "\n".join([
-        field("HOA Y/N", getattr(ld, "association_yn", None)),
-        field("HOA Fee", f"${getattr(ld, 'association_fee', None)}" if getattr(ld, "association_fee", None) else None),
-        field("HOA Frequency", getattr(ld, "association_fee_frequency", None)),
-        field("Tax Annual Amount", f"${getattr(ld, 'tax_annual_amount', None):,}" if getattr(ld, "tax_annual_amount", None) else None),
-        field("Tax Year", getattr(ld, "tax_year", None)),
-    ])))
-
-    # --- Marketing ---
-    lines.append(_format_section("MARKETING", "\n".join([
-        field("Photos Count", getattr(ld, "photos_count", None)),
-        field("Showing Instructions", getattr(ld, "showing_requirements", None)),
-        field("Virtual Tour URL", getattr(ld, "virtual_tour_url_unbranded", None)),
-    ])))
-
-    lines.append("=" * 60)
-    lines.append("Public Remarks (MLS Description):")
-    lines.append("=" * 60)
-    lines.append(res.get("mls_summary", ""))
-
     return "\n".join(lines)
 
 
@@ -217,45 +116,18 @@ def _build_email_campaign_file(res: dict, email_tone: str = "Professional") -> s
     return "\n".join(lines)
 
 
-def _build_video_scripts_file(res: dict) -> str:
-    lines = [_format_header("SHORT FORM VIDEO SCRIPTS")]
-    lines.append(
-        "Film these scripts with your phone. Follow each shot direction in order.\n"
-        "No video editing experience required.\n"
-    )
+def _compute_compliance_counts(compliance_results) -> dict:
+    """
+    Tally compliance review statuses. Single source of truth for both the
+    summary file and the detailed audit file.
 
-    video_suite = res.get("video_scripts")
-    if not video_suite:
-        lines.append("No video scripts generated.")
-        return "\n".join(lines)
-
-    scripts = [
-        ("INSTAGRAM REEL", video_suite.reel),
-        ("TIKTOK", video_suite.tiktok),
-        ("YOUTUBE SHORT", video_suite.youtube_short),
-    ]
-
-    for label, script in scripts:
-        shot_lines = []
-        for shot in script.shots:
-            image_ref = f" [{shot.image_filename}]" if shot.image_filename else ""
-            features = ", ".join(shot.visible_features) if shot.visible_features else ""
-            feature_str = f" — {features}" if features else ""
-            shot_lines.append(
-                f"  Shot {shot.order}{image_ref}{feature_str}\n"
-                f"  Direction: {shot.direction}"
-            )
-
-        content = (
-            f"Duration: {script.duration_seconds} seconds\n\n"
-            f"HOOK:\n{script.hook}\n\n"
-            f"SHOT LIST:\n" + "\n\n".join(shot_lines) + "\n\n"
-            f"VOICEOVER:\n{script.voiceover}\n\n"
-            f"CALL TO ACTION:\n{script.cta}"
-        )
-        lines.append(_format_section(label, content))
-
-    return "\n".join(lines)
+    Returns: {"total": int, "pass": int, "revised": int, "flagged": int}
+    """
+    counts = {"total": len(compliance_results), "pass": 0, "revised": 0, "flagged": 0}
+    for review in compliance_results:
+        if review.status in counts:
+            counts[review.status] += 1
+    return counts
 
 
 def _build_compliance_audit_file(res: dict) -> str:
@@ -270,7 +142,7 @@ def _build_compliance_audit_file(res: dict) -> str:
         lines.append("No compliance results available.")
         return "\n".join(lines)
 
-    status_counts = {"pass": 0, "revised": 0, "flagged": 0}
+    counts = _compute_compliance_counts(compliance_results)
     audit_lines = []
 
     for review in compliance_results:
@@ -288,17 +160,13 @@ def _build_compliance_audit_file(res: dict) -> str:
         if review.reviewer_notes:
             entry += f"\n  Notes: {review.reviewer_notes}"
 
-        if review.status in status_counts:
-            status_counts[review.status] += 1
-
         audit_lines.append(entry)
 
-    total = len(compliance_results)
     summary = (
-        f"SUMMARY: {total} assets reviewed — "
-        f"{status_counts['pass']} passed, "
-        f"{status_counts['revised']} revised, "
-        f"{status_counts['flagged']} flagged\n"
+        f"SUMMARY: {counts['total']} assets reviewed — "
+        f"{counts['pass']} passed, "
+        f"{counts['revised']} revised, "
+        f"{counts['flagged']} flagged\n"
     )
     lines.append(summary)
     lines.append("\nDETAILED RESULTS:\n")
@@ -306,14 +174,214 @@ def _build_compliance_audit_file(res: dict) -> str:
 
     return "\n".join(lines)
 
+# Character target for the lifestyle paragraph — sized for the MLS
+# community/neighborhood field on most boards.
+NEIGHBORHOOD_PARAGRAPH_CHAR_LIMIT = 500
+
+
+def _neighborhood_has_content(guide) -> bool:
+    """True if the structured guide has anything worth rendering."""
+    if guide is None:
+        return False
+    if getattr(guide, "lifestyle_paragraph", "").strip():
+        return True
+    return any([
+        getattr(guide, "everyday", []),
+        getattr(guide, "outdoor", []),
+        getattr(guide, "dining", []),
+        getattr(guide, "wellness", []),
+    ])
+
+
+def _format_neighborhood_section(title: str, items) -> str:
+    """Format a single bulleted category section. Returns '' if no items."""
+    if not items:
+        return ""
+    bullets = "\n".join(f"- {item.name} — {item.description}" for item in items)
+    border = "-" * 40
+    return f"{border}\n{title}\n{border}\n{bullets}\n\n"
+
+
 def _build_neighborhood_insight_file(res: dict) -> str:
+    """
+    Multi-section neighborhood guide:
+      - Lifestyle paragraph (sized for MLS community field, with char count)
+      - The Everyday
+      - Outdoor & Recreation
+      - Dining Nearby
+      - Wellness & Fitness
+
+    Empty sections are omitted entirely. Sparse-data properties get a
+    shorter file rather than placeholder text.
+    """
+    guide = res.get("neighborhood_guide")
+
     lines = [_format_header("NEIGHBORHOOD INSIGHT")]
     lines.append(
         "AI-generated neighborhood guide based on live local data.\n"
         "Review before sharing — verify place names are current.\n"
     )
-    lines.append(res.get("neighborhood_guide", ""))
+
+    # --- Lifestyle paragraph (with char count footer like MLS file) ---
+    paragraph = getattr(guide, "lifestyle_paragraph", "").strip() if guide else ""
+    if paragraph:
+        char_count = len(paragraph)
+        section = (
+            f"{'-' * 40}\n"
+            f"NEIGHBORHOOD SUMMARY\n"
+            f"{'-' * 40}\n"
+            f"{paragraph}\n\n"
+            f"[{char_count} / {NEIGHBORHOOD_PARAGRAPH_CHAR_LIMIT} characters]\n\n"
+        )
+        lines.append(section)
+
+    # --- Categorical sections (omit empty ones entirely) ---
+    if guide is not None:
+        lines.append(_format_neighborhood_section("THE EVERYDAY", guide.everyday))
+        lines.append(_format_neighborhood_section("OUTDOOR & RECREATION", guide.outdoor))
+        lines.append(_format_neighborhood_section("DINING NEARBY", guide.dining))
+        lines.append(_format_neighborhood_section("WELLNESS & FITNESS", guide.wellness))
+
+    # Filter out the empty strings returned by skipped sections
+    return "".join(part for part in lines if part)
+
+
+def _build_summary_file(res: dict, address: str | None, rename_result=None) -> str:
+    """
+    Agent-facing receipt. First file alphabetically in the ZIP.
+    Pulls metadata, image intelligence, and compliance results into a
+    single scannable view.
+    """
+    lines = [_format_header("LISTING PACKAGE SUMMARY")]
+
+    # --- Metadata ---
+    listing_details = res.get("listing_details")
+    pricing = getattr(listing_details, "pricing", None) if listing_details else None
+    list_price_value = getattr(pricing, "list_price", None) if pricing else None
+    list_price_str = f"${list_price_value:,}" if list_price_value else "—"
+
+    generated_str = datetime.now().strftime("%B %d, %Y")
+    address_str = address if address else "—"
+
+    lines.append(f"Generated:      {generated_str}")
+    lines.append(f"Property:       {address_str}")
+    lines.append(f"List Price:     {list_price_str}")
+    lines.append("")
+
+    # --- Image Intelligence ---
+    image_intel = res.get("image_intelligence")
+    analyzed_images = res.get("property_images") or []
+
+    photos_analyzed = len(analyzed_images)
+    photos_selected = len(rename_result.curated) if rename_result else 0
+
+    intel_lines = [
+        f"Photos analyzed:           {photos_analyzed}",
+        f"Photos selected for MLS:   {photos_selected}",
+        "",
+    ]
+
+    if image_intel and getattr(image_intel, "highlights", None):
+        intel_lines.append("Top features detected from your photos:")
+        for highlight in image_intel.highlights[:5]:
+            feature_name = highlight.feature.replace("_", " ").title()
+            intel_lines.append(f"  - {feature_name}")
+    else:
+        intel_lines.append("Top features detected from your photos:")
+        intel_lines.append("  (none detected)")
+
+    lines.append(_format_section("IMAGE INTELLIGENCE", "\n".join(intel_lines)))
+
+    # --- Compliance Audit ---
+    compliance_results = res.get("compliance_results", [])
+    counts = _compute_compliance_counts(compliance_results)
+
+    compliance_lines = [
+        f"Assets reviewed:  {counts['total']}",
+        f"Passed:           {counts['pass']}",
+        f"Revised:          {counts['revised']}",
+        f"Flagged:          {counts['flagged']}",
+    ]
+    lines.append(_format_section("COMPLIANCE AUDIT", "\n".join(compliance_lines)))
+
+    # --- Manifest ---
+    manifest_lines = [
+        "  00_summary.txt              This file",
+        "  01_headline.txt             Listing headline + usage guide",
+        "  02_mls_description.txt      MLS public remarks (under 950 chars)",
+        "  03_social_posts.txt         Facebook + Instagram captions",
+        "  04_email_campaign.txt       4-email drip campaign",
+        "  05_compliance_audit.txt     Per-asset compliance review",
+    ]
+    if _neighborhood_has_content(res.get("neighborhood_guide")):
+        manifest_lines.append("  06_neighborhood_insight.txt AI-generated neighborhood guide")
+    if rename_result is not None:
+        manifest_lines.append("  07_photo_captions.txt       Per-photo captions for MLS/Zillow alt text")
+        manifest_lines.append("  /photos/curated/            Top 25 photos, ranked and renamed")
+        if getattr(rename_result, "additional", None):
+            manifest_lines.append("  /photos/additional/         Remaining photos")
+    lines.append(_format_section("WHAT'S IN THIS PACKAGE", "\n".join(manifest_lines)))
+
+    # --- Footer ---
+    border = "-" * 60
+    lines.append(border)
+    lines.append("This package was generated by metes.")
+    lines.append("Your download link is valid for 7 days.")
+    lines.append("metes.app")
+    lines.append(border)
+
     return "\n".join(lines)
+
+
+def _build_photo_captions_file(res: dict, rename_result) -> str:
+    """
+    Per-photo reference for MLS uploads, Zillow alt text, and social media.
+    Curated photos only. Filenames match /photos/curated/ in the ZIP.
+    Joined by image_id between rename_result.curated and the analyzed
+    PropertyImage list so captions and renamed filenames stay aligned.
+    """
+    lines = [_format_header("PHOTO CAPTIONS")]
+    lines.append(
+        "Per-photo captions for MLS uploads, Zillow alt text, and\n"
+        "social media. Filenames match the photos in /photos/curated/.\n\n"
+        "Photos ordered by marketing impact rank (01 = hero).\n"
+    )
+
+    if rename_result is None or not getattr(rename_result, "curated", None):
+        lines.append("No curated photos available.")
+        return "\n".join(lines)
+
+    # Index PropertyImage objects by image_id for caption lookup
+    property_images = res.get("property_images") or []
+    images_by_id = {img.image_id: img for img in property_images}
+
+    for renamed_img in rename_result.curated:
+        source_img = images_by_id.get(renamed_img.image_id)
+
+        if source_img is None:
+            block_content = (
+                f"Room:     —\n"
+                f"Caption:  (not generated)\n"
+                f"Features: —"
+            )
+            lines.append(_format_section(renamed_img.renamed_filename, block_content))
+            continue
+
+        room_label = source_img.metadata.room_type.replace("_", " ").title()
+        caption = source_img.caption if source_img.caption else "(not generated)"
+        features = ", ".join(
+            f.name.replace("_", " ").title() for f in source_img.visible_features
+        ) if source_img.visible_features else "—"
+
+        block_content = (
+            f"Room:     {room_label}\n"
+            f"Caption:  {caption}\n"
+            f"Features: {features}"
+        )
+        lines.append(_format_section(renamed_img.renamed_filename, block_content))
+
+    return "\n".join(lines)
+
 
 def build_marketing_package_zip(
     res: dict,
@@ -347,20 +415,22 @@ def build_marketing_package_zip(
     with zipfile.ZipFile(buffer, mode="w", compression=zipfile.ZIP_DEFLATED) as zf:
         folder = f"{zip_filename_prefix}listing_package_{timestamp}/"
 
+        # --- Summary (agent receipt, first file alphabetically) ---
+        zf.writestr(folder + "00_summary.txt", _build_summary_file(res, address, rename_result))
+
         # --- Marketing copy files ---
         zf.writestr(folder + "01_headline.txt", _build_headline_file(res))
         zf.writestr(folder + "02_mls_description.txt", _build_mls_description_file(res))
-        zf.writestr(folder + "03_listing_data_for_mls.txt", _build_listing_data_file(res))
-        zf.writestr(folder + "04_social_posts.txt", _build_social_posts_file(res))
-        zf.writestr(folder + "05_email_campaign.txt", _build_email_campaign_file(res, email_tone))
-        zf.writestr(folder + "06_compliance_audit.txt", _build_compliance_audit_file(res))
+        zf.writestr(folder + "03_social_posts.txt", _build_social_posts_file(res))
+        zf.writestr(folder + "04_email_campaign.txt", _build_email_campaign_file(res, email_tone))
+        zf.writestr(folder + "05_compliance_audit.txt", _build_compliance_audit_file(res))
 
-        # Video scripts only included when feature is enabled
-        if res.get("video_scripts") is not None:
-            zf.writestr(folder + "07_video_scripts.txt", _build_video_scripts_file(res))
+        if _neighborhood_has_content(res.get("neighborhood_guide")):
+            zf.writestr(folder + "06_neighborhood_insight.txt", _build_neighborhood_insight_file(res))
 
-        if res.get("neighborhood_guide"):
-            zf.writestr(folder + "08_neighborhood_insight.txt", _build_neighborhood_insight_file(res))
+        # --- Photo captions (only when curated photos exist) ---
+        if rename_result is not None:
+            zf.writestr(folder + "07_photo_captions.txt", _build_photo_captions_file(res, rename_result))
 
         # --- Photos subfolders ---
         # photos/curated/   — top CURATED_SET_SIZE images, AI-ranked and renamed
