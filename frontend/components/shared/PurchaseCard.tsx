@@ -15,17 +15,17 @@ interface PurchaseCardProps {
 }
 
 const LISTING_FEATURES = [
-  "MLS-ready listing description",
-  "Social launch pack (Facebook + 2× Instagram)",
-  "4-email campaign sequence",
-  "Fair Housing compliance audit",
+  "MLS description that sells the lifestyle",
+  "Social pack — Facebook + 2× Instagram",
+  "4-email drip — Just Listed through Just Sold",
+  "Fair Housing audit on every asset",
 ];
 
 const PHOTO_FEATURES = [
   "Everything in Listing Copy",
-  "Color correction + perspective fix",
-  "Twilight sky replacement (eligible exteriors)",
-  "Delivered to your email",
+  "Color correction + exposure balancing",
+  "Sky enhancement on every eligible exterior",
+  "Perspective + lens distortion fix",
 ];
 
 export function PurchaseCard({
@@ -77,7 +77,7 @@ export function PurchaseCard({
         }}
         title="Listing Copy"
         price={formatPrice(PRICING.listing)}
-        description="Full marketing copy package"
+        description="Everything you need to launch a listing"
         features={LISTING_FEATURES}
       />
 
@@ -95,7 +95,7 @@ export function PurchaseCard({
         }}
         title="Listing + Photo Editing"
         price={formatPrice(PRICING.both)}
-        description={`Includes +${formatPrice(PRICING.photos)} photo enhancement`}
+        description={`Professionally edited photos +${formatPrice(PRICING.photos)}`}
         features={PHOTO_FEATURES}
       />
 
