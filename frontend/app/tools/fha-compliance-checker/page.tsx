@@ -14,13 +14,13 @@ export const metadata: Metadata = {
     "real estate compliance tool",
   ],
   alternates: {
-    canonical: "https://metes.app/tools/fha-compliance-check",
+    canonical: "https://metes.app/tools/fha-compliance-checker",
   },
   openGraph: {
     title: "Free Fair Housing Compliance Checker for Real Estate Agents",
     description:
       "Scan your MLS description for Fair Housing violations in 3 seconds. Free AI-powered audit. No signup.",
-    url: "https://metes.app/tools/fha-compliance-check",
+    url: "https://metes.app/tools/fha-compliance-checker",
     siteName: "metes",
     type: "website",
     images: [
