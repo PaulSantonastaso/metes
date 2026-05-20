@@ -174,14 +174,76 @@ def _build_compliance_audit_file(res: dict) -> str:
 
     return "\n".join(lines)
 
+# Character target for the lifestyle paragraph — sized for the MLS
+# community/neighborhood field on most boards.
+NEIGHBORHOOD_PARAGRAPH_CHAR_LIMIT = 500
+
+
+def _neighborhood_has_content(guide) -> bool:
+    """True if the structured guide has anything worth rendering."""
+    if guide is None:
+        return False
+    if getattr(guide, "lifestyle_paragraph", "").strip():
+        return True
+    return any([
+        getattr(guide, "everyday", []),
+        getattr(guide, "outdoor", []),
+        getattr(guide, "dining", []),
+        getattr(guide, "wellness", []),
+    ])
+
+
+def _format_neighborhood_section(title: str, items) -> str:
+    """Format a single bulleted category section. Returns '' if no items."""
+    if not items:
+        return ""
+    bullets = "\n".join(f"- {item.name} — {item.description}" for item in items)
+    border = "-" * 40
+    return f"{border}\n{title}\n{border}\n{bullets}\n\n"
+
+
 def _build_neighborhood_insight_file(res: dict) -> str:
+    """
+    Multi-section neighborhood guide:
+      - Lifestyle paragraph (sized for MLS community field, with char count)
+      - The Everyday
+      - Outdoor & Recreation
+      - Dining Nearby
+      - Wellness & Fitness
+
+    Empty sections are omitted entirely. Sparse-data properties get a
+    shorter file rather than placeholder text.
+    """
+    guide = res.get("neighborhood_guide")
+
     lines = [_format_header("NEIGHBORHOOD INSIGHT")]
     lines.append(
         "AI-generated neighborhood guide based on live local data.\n"
         "Review before sharing — verify place names are current.\n"
     )
-    lines.append(res.get("neighborhood_guide", ""))
-    return "\n".join(lines)
+
+    # --- Lifestyle paragraph (with char count footer like MLS file) ---
+    paragraph = getattr(guide, "lifestyle_paragraph", "").strip() if guide else ""
+    if paragraph:
+        char_count = len(paragraph)
+        section = (
+            f"{'-' * 40}\n"
+            f"NEIGHBORHOOD SUMMARY\n"
+            f"{'-' * 40}\n"
+            f"{paragraph}\n\n"
+            f"[{char_count} / {NEIGHBORHOOD_PARAGRAPH_CHAR_LIMIT} characters]\n\n"
+        )
+        lines.append(section)
+
+    # --- Categorical sections (omit empty ones entirely) ---
+    if guide is not None:
+        lines.append(_format_neighborhood_section("THE EVERYDAY", guide.everyday))
+        lines.append(_format_neighborhood_section("OUTDOOR & RECREATION", guide.outdoor))
+        lines.append(_format_neighborhood_section("DINING NEARBY", guide.dining))
+        lines.append(_format_neighborhood_section("WELLNESS & FITNESS", guide.wellness))
+
+    # Filter out the empty strings returned by skipped sections
+    return "".join(part for part in lines if part)
 
 
 def _build_summary_file(res: dict, address: str | None, rename_result=None) -> str:
@@ -251,7 +313,7 @@ def _build_summary_file(res: dict, address: str | None, rename_result=None) -> s
         "  04_email_campaign.txt       4-email drip campaign",
         "  05_compliance_audit.txt     Per-asset compliance review",
     ]
-    if res.get("neighborhood_guide"):
+    if _neighborhood_has_content(res.get("neighborhood_guide")):
         manifest_lines.append("  06_neighborhood_insight.txt AI-generated neighborhood guide")
     if rename_result is not None:
         manifest_lines.append("  07_photo_captions.txt       Per-photo captions for MLS/Zillow alt text")
@@ -363,7 +425,7 @@ def build_marketing_package_zip(
         zf.writestr(folder + "04_email_campaign.txt", _build_email_campaign_file(res, email_tone))
         zf.writestr(folder + "05_compliance_audit.txt", _build_compliance_audit_file(res))
 
-        if res.get("neighborhood_guide"):
+        if _neighborhood_has_content(res.get("neighborhood_guide")):
             zf.writestr(folder + "06_neighborhood_insight.txt", _build_neighborhood_insight_file(res))
 
         # --- Photo captions (only when curated photos exist) ---

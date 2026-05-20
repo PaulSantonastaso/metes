@@ -57,7 +57,7 @@ async def generate_marketing_assets_service(
     # --- Neighborhood enrichment — runs before MLS chain ---
     # Graceful fallback if address missing, geocoding fails, or no places found
     neighborhood_context = None
-    neighborhood_guide = ""
+    neighborhood_guide = None  # NeighborhoodOutput object when populated
     neighborhood_mls_insert = ""
 
     if google_places_api_key and details.address:
@@ -79,9 +79,10 @@ async def generate_marketing_assets_service(
             )
             if neighborhood_copy:
                 neighborhood_mls_insert = neighborhood_copy.mls_insert or ""
-                neighborhood_guide = neighborhood_copy.neighborhood_guide or ""
+                neighborhood_guide = neighborhood_copy
                 print(f"[NEIGHBORHOOD] MLS insert: {neighborhood_mls_insert}")
-                print(f"[NEIGHBORHOOD] Guide: {neighborhood_guide}")
+                print(f"[NEIGHBORHOOD] Lifestyle paragraph: {neighborhood_copy.lifestyle_paragraph}")
+                print(f"[NEIGHBORHOOD] Sections — everyday:{len(neighborhood_copy.everyday)} outdoor:{len(neighborhood_copy.outdoor)} dining:{len(neighborhood_copy.dining)} wellness:{len(neighborhood_copy.wellness)}")
 
     # --- MLS description runs first — feeds all downstream chains ---
     listing_result = await listing_chain.ainvoke({
