@@ -69,7 +69,7 @@ export default function Footer() {
           {([
             ["Product", ["How it works", "See an example", "Pricing"]],
             ["Features", ["Compliance audit", "Neighborhood intelligence", "Photo curation"]],
-            ["Free tools", ["Fair Housing checker"]],
+            ["Free tools", ["Fair Housing checker", "Neighborhood guide generator"]],
             ["Company", ["About", "Contact"]],
           ] as [string, string[]][]).map(([heading, links]) => (
             <div key={heading}>
@@ -95,6 +95,7 @@ export default function Footer() {
                   "Photo curation": "/photo-curation",
                   // Free tools
                   "Fair Housing checker": "/tools/fha-compliance-checker",
+                  "Neighborhood guide generator": "/tools/neighborhood-guide-generator",
                   // Company
                   "About": "/about",
                   "Contact": "/contact",

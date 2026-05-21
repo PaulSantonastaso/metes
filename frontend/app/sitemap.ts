@@ -26,5 +26,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: "https://www.metes.app/tools/neighborhood-guide-generator",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
   ];
 }
