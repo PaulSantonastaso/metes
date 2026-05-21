@@ -430,6 +430,46 @@ def _serialize_session(session: dict) -> dict:
     }
 
 
+def _format_dossier_for_tool(copy) -> str:
+    """
+    Format a NeighborhoodOutput as a clean text dossier for the free tool.
+    Uses uppercase section headers, • bullets, blank-line separators.
+    No decoration, no character count, no preamble.
+    Empty sections are skipped.
+    """
+    if not copy:
+        return ""
+
+    parts: list[str] = []
+
+    # Lifestyle summary
+    if copy.lifestyle_paragraph:
+        parts.append("NEIGHBORHOOD SUMMARY")
+        parts.append("")
+        parts.append(copy.lifestyle_paragraph)
+
+    # Categorical sections — skip any that are empty
+    sections = [
+        ("THE EVERYDAY", copy.everyday),
+        ("OUTDOOR & RECREATION", copy.outdoor),
+        ("DINING NEARBY", copy.dining),
+        ("WELLNESS & FITNESS", copy.wellness),
+    ]
+
+    for header, items in sections:
+        if not items:
+            continue
+        if parts:
+            parts.append("")
+            parts.append("")
+        parts.append(header)
+        parts.append("")
+        for item in items:
+            parts.append(f"• {item.name} — {item.description}")
+
+    return "\n".join(parts).strip() + "\n"  
+
+
 # ---------------------------------------------------------------------------
 # Health check
 # ---------------------------------------------------------------------------
@@ -1298,7 +1338,6 @@ async def neighborhood_guide_tool(
 
     return {
         "address": address,
-        "neighborhood_guide": neighborhood_copy.neighborhood_guide or "",
-        "mls_insert": neighborhood_copy.mls_insert or "",
+        "neighborhood_guide": _format_dossier_for_tool(neighborhood_copy),
         "places": [p.name for p in neighborhood_context.places],
     }
