@@ -23,9 +23,42 @@ const C = {
 
 const CONTENT = "mx-auto w-full max-w-[1280px] px-6 lg:px-12";
 
+const ORGANIZATION_SCHEMA = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "Metes",
+  "url": "https://www.metes.app",
+  "logo": "https://www.metes.app/logo.png",
+  "description": "AI marketing kits for real estate listings. MLS description, social posts, email campaign, photo curation, and neighborhood guide generated from photos and notes. $35 per listing, no subscription.",
+  "founder": {
+    "@type": "Person",
+    "name": "Paul Santonastaso",
+    "url": "https://github.com/PaulSantonastaso"
+  },
+  "foundingDate": "2025",
+  "sameAs": [
+    "https://github.com/PaulSantonastaso/Metes",
+    "https://www.linkedin.com/company/metesapp",
+    "https://www.crunchbase.com/organization/metes-301f",
+    "https://www.trustpilot.com/review/metes.app",
+  ],
+  "knowsAbout": [
+    "Real estate marketing",
+    "MLS listing descriptions",
+    "Fair Housing compliance",
+    "Real estate AI tools",
+    "Property listing automation"
+  ]
+};
+
 export default function Footer() {
   return (
     <footer style={{ background: C.forestDeep, padding: "64px 0 32px" }}>
+      <script
+        key="org-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(ORGANIZATION_SCHEMA) }}
+      />
       <div className={CONTENT}>
         <div className="grid grid-cols-2 gap-8 sm:grid-cols-[2fr_1fr_1fr_1fr_1fr]" style={{ marginBottom: "48px" }}>
           <div className="col-span-2 sm:col-span-1">
