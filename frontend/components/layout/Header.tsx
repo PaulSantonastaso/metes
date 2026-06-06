@@ -83,7 +83,7 @@ export function Header({ variant = "light", sticky = true }: HeaderProps) {
           >
             How it works
           </Link>
-          <Link href="/#neighborhood-intelligence" className={`text-[13px] font-medium no-underline transition-colors ${linkColor}`}>
+          <Link href="/neighborhood-intelligence" className={`text-[13px] font-medium no-underline transition-colors ${linkColor}`}>
             Neighborhood
           </Link>
           <Link

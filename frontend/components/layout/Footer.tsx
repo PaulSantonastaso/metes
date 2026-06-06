@@ -124,7 +124,7 @@ export default function Footer() {
                   "Pricing": "/#pricing",
                   // Features
                   "Compliance audit": "/compliance-audit",
-                  "Neighborhood intelligence": "/#neighborhood-intelligence",
+                  "Neighborhood intelligence": "/neighborhood-intelligence",
                   "Photo curation": "/photo-curation",
                   // Free tools
                   "Fair Housing checker": "/tools/fha-compliance-checker",
