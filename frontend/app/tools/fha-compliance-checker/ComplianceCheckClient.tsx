@@ -39,7 +39,7 @@ const HOW_IT_WORKS = [
   {
     step: "STEP 02",
     title: "Instant risk analysis",
-    body: "Our AI cross-references your text against established Fair Housing guidelines and known exclusionary terms.",
+    body: "Metes checks every phrase against Fair Housing rules and the specific language that lands agents in complaints.",
   },
   {
     step: "STEP 03",
@@ -249,7 +249,7 @@ export function ComplianceCheckClient() {
             <SectionLabel>Free tool · Fair Housing compliance</SectionLabel>
 
             <h1 className="mb-4 font-manrope text-[clamp(28px,4.5vw,48px)] font-medium leading-[1.08] tracking-[0.005em] text-[#14271E]">
-              Your listing might be a Fair Housing violation.
+              Your listing might be a <em className="not-italic text-[#9A7E50]">Fair Housing violation</em>.
             </h1>
 
             <p className="mb-8 max-w-[600px] text-[clamp(14px,1.2vw,17px)] leading-[1.6] text-[#4A6B53]">
@@ -301,7 +301,7 @@ export function ComplianceCheckClient() {
               </div>
             </div>
 
-            <div className="mt-4 flex justify-center">
+            <div className="mt-4 flex justify-start">
               <Turnstile
                 siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
                 onSuccess={setTurnstileToken}
@@ -402,7 +402,7 @@ export function ComplianceCheckClient() {
 
                   <div className="border-t border-[rgba(201,123,92,0.2)] pt-5">
                     <p className="mb-4 text-[14px] leading-[1.6] text-[#14271E]">
-                      Don&apos;t risk a rejected listing or a complaint. For $35, metes rewrites this from scratch — fully compliant MLS copy, social posts, email sequence, and a sorted photo set.
+                      Don&apos;t risk a rejected listing or a complaint. For $35, Metes rewrites this from scratch — fully compliant MLS copy, social posts, email sequence, and a sorted photo set.
                     </p>
                     <Link
                       href="/"
@@ -433,7 +433,7 @@ export function ComplianceCheckClient() {
 
                   <div className="border-t border-[rgba(92,138,110,0.2)] pt-5">
                     <p className="mb-4 text-[14px] leading-[1.6] text-[#14271E]">
-                      Your copy is legally safe. But is it doing the work? metes turns this draft into a full marketing kit — MLS, social, email, and sorted photos — in under 60 seconds.
+                      Your copy is legally safe. But is it doing the work? Metes turns this draft into a full marketing kit — MLS, social, email, and sorted photos — in under 60 seconds.
                     </p>
                     <Link
                       href="/"
@@ -478,7 +478,7 @@ export function ComplianceCheckClient() {
                 . You don&apos;t have time to memorize the rulebook between showings.
               </p>
               <p className="text-[#F4F0E8]">
-                Let metes do it for you.
+                Let Metes do it for you.
               </p>
             </div>
           </div>
@@ -528,7 +528,7 @@ export function ComplianceCheckClient() {
           <div className="max-w-[680px]">
             <SectionLabel light>Skip the audit</SectionLabel>
             <h2 className="mb-4 font-manrope text-[clamp(26px,4vw,44px)] font-medium leading-[1.1] tracking-[0.005em] text-[#F4F0E8]">
-              Or just have metes write it from scratch.
+              Or just have Metes write it from scratch.
             </h2>
             <p className="mb-8 text-[clamp(14px,1.2vw,17px)] leading-[1.6] text-[rgba(244,240,232,0.78)]">
               Compliant by default. Lifestyle-forward, never utility-forward. MLS description, social launch pack, four-email sequence, and your top photos — sorted, renamed, ready to upload. $35 per listing. No subscription.
@@ -547,6 +547,63 @@ export function ComplianceCheckClient() {
               >
                 Scan another draft
               </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─────────────── FAQ — WARM CREAM ─────────────── */}
+      <section className="border-t border-[rgba(20,39,30,0.10)] bg-[#F4F0E8] py-20 sm:py-24">
+        <div className="mx-auto w-full max-w-[960px] px-6 lg:px-8">
+          <div className="mx-auto max-w-[820px]">
+            <SectionLabel>Common questions</SectionLabel>
+            <h2 className="mb-10 font-manrope text-[clamp(24px,3.5vw,40px)] font-medium leading-[1.15] tracking-[0.005em] text-[#14271E]">
+              What agents ask about <em className="not-italic text-[#9A7E50]">Fair Housing compliance</em>.
+            </h2>
+
+            <div className="flex flex-col gap-4">
+              {[
+                {
+                  q: "Can a single word in my listing really cause a Fair Housing complaint?",
+                  a: "Yes. HUD prosecutes language that signals preference based on race, color, religion, sex, familial status, disability, or national origin — regardless of whether you meant discrimination. Phrases like \"great for families,\" \"walking distance,\" or \"safe neighborhood\" have all been the basis for complaints. Civil penalties start at $16,000 for a first offense.",
+                },
+                {
+                  q: "Does the checker save my listing draft?",
+                  a: "No. The text you paste in is scanned and discarded after the result is returned. We track usage by IP for rate limiting, but the draft itself is not stored, logged, or used for any other purpose.",
+                },
+                {
+                  q: "How accurate is the audit?",
+                  a: "The checker catches the language patterns HUD has historically prosecuted plus the phrases that appear in NAR's Fair Housing reference materials. No automated review replaces legal counsel for high-stakes situations, but the checker catches the everyday accidents — the phrases an agent didn't realize were a problem.",
+                },
+                {
+                  q: "What's the difference between this and what my broker reviews?",
+                  a: "Most broker reviews happen after the listing is written and submitted. By then, you've already invested time in the copy. This checker runs in seconds while you're still drafting, so you catch issues before they become broker pushback or, worse, a published listing with a violation.",
+                },
+                {
+                  q: "Is the checker free to use?",
+                  a: "Three scans per session are completely free, no email required. After that, an email unlocks unlimited continued use — no card on file, no subscription, no sales follow-up.",
+                },
+                {
+                  q: "Why use this instead of just reading the Fair Housing rules myself?",
+                  a: "Most violations aren't from agents who haven't read the rules — they're from agents who know the rules and still miss specific phrases under deadline. The checker catches accidents. It also catches the phrases that aren't technically prohibited but have been used in HUD complaints, which is harder to predict without case experience.",
+                },
+                {
+                  q: "Can the checker suggest compliant rewrites?",
+                  a: "Yes. Every flagged phrase comes with a suggested rewrite that preserves the marketing intent without the compliance risk. \"Walking distance to the park\" becomes \"two blocks from the park.\" \"Great for families\" becomes a description of the actual feature — the fenced yard, the playroom, the school district.",
+                },
+              ].map(({ q, a }, i) => (
+                <details
+                  key={i}
+                  className="rounded-[12px] border border-[rgba(20,39,30,0.10)] bg-[#FAF7F0] px-6 py-5"
+                >
+                  <summary className="cursor-pointer list-none font-manrope text-[16px] font-medium tracking-[-0.005em] text-[#14271E]">
+                    {q}
+                  </summary>
+                  <div className="mt-3.5 text-[14px] leading-[1.65] text-[#4A6B53]">
+                    {a}
+                  </div>
+                </details>
+              ))}
             </div>
           </div>
         </div>

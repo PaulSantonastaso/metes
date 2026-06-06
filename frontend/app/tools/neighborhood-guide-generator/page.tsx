@@ -114,7 +114,7 @@ const faqJsonLd = {
 
 const toolJsonLd = {
   "@context": "https://schema.org",
-  "@type": "WebApplication",
+  "@type": "SoftwareApplication",
   name: "Neighborhood Description Generator",
   description:
     "Free AI tool for real estate agents to generate Fair Housing-aware neighborhood descriptions for MLS listings using live Google Places data.",

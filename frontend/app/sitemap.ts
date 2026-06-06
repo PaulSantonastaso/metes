@@ -21,6 +21,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: "https://www.metes.app/neighborhood-intelligence",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: 'https://www.metes.app/tools/listing-description-checker',
       lastModified: new Date(),
       changeFrequency: 'monthly',
