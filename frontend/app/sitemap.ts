@@ -34,7 +34,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: "https://www.metes.app/learn/fair-housing-language-mls-listings",
-      lastModified: new Date(),
+      lastModified: new Date("2026-06-10"),
       changeFrequency: "monthly",
       priority: 0.8,
     },
