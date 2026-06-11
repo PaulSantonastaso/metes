@@ -412,6 +412,33 @@ function InlineCTA() {
 }
 
 // ─────────────────────────────────────────────────────────────────
+// Bulleted list — gold bullets, matches feature page convention
+// ─────────────────────────────────────────────────────────────────
+
+function BulletList({ items }: { items: React.ReactNode[] }) {
+  return (
+    <ul style={{ listStyle: "none", padding: 0, margin: "0 0 16px 0", display: "flex", flexDirection: "column", gap: "10px" }}>
+      {items.map((item, i) => (
+        <li
+          key={i}
+          style={{
+            paddingLeft: "20px",
+            position: "relative",
+            fontFamily: "var(--font-manrope, sans-serif)",
+            fontSize: "16px",
+            lineHeight: 1.7,
+            color: C.ink,
+          }}
+        >
+          <span style={{ position: "absolute", left: "4px", color: C.gold, fontWeight: 600 }}>•</span>
+          {item}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
 // Phrase table component
 // ─────────────────────────────────────────────────────────────────
 
@@ -673,19 +700,19 @@ export default function FairHousingLanguageReferencePage() {
               </p>
 
               <h3 style={h3Style}>What this changes operationally</h3>
-              <ul style={{ ...proseStyle, paddingLeft: "20px" }}>
-                <li>Discussing factual, publicly available crime statistics with a buyer is acceptable</li>
-                <li>Sharing school quality ratings (GreatSchools, state assessment data, district performance reports) is acceptable</li>
-                <li>Answering direct questions about neighborhood safety with verifiable data is acceptable</li>
-                <li>The information must be shared consistently across all clients — not selectively offered based on perceived demographics</li>
-              </ul>
+              <BulletList items={[
+                "Discussing factual, publicly available crime statistics with a buyer is acceptable",
+                "Sharing school quality ratings (GreatSchools, state assessment data, district performance reports) is acceptable",
+                "Answering direct questions about neighborhood safety with verifiable data is acceptable",
+                "The information must be shared consistently across all clients — not selectively offered based on perceived demographics",
+              ]} />
 
               <h3 style={h3Style}>What this doesn&apos;t change</h3>
-              <ul style={{ ...proseStyle, paddingLeft: "20px" }}>
-                <li>Intentional steering remains illegal. Directing buyers toward or away from neighborhoods based on protected-class characteristics is still a Fair Housing violation.</li>
-                <li>Subjective characterizations like &ldquo;safe neighborhood&rdquo; or &ldquo;good area&rdquo; remain coded language and are still risky in advertising.</li>
-                <li>Section 804(c) of the Fair Housing Act still prohibits advertising language that indicates preference based on race, color, religion, sex, familial status, disability, or national origin.</li>
-              </ul>
+              <BulletList items={[
+                "Intentional steering remains illegal. Directing buyers toward or away from neighborhoods based on protected-class characteristics is still a Fair Housing violation.",
+                <>Subjective characterizations like &ldquo;safe neighborhood&rdquo; or &ldquo;good area&rdquo; remain coded language and are still risky in advertising.</>,
+                "Section 804(c) of the Fair Housing Act still prohibits advertising language that indicates preference based on race, color, religion, sex, familial status, disability, or national origin.",
+              ]} />
 
               <p style={proseStyle}>
                 The distinction is between sharing factual data (now explicitly permitted) and using descriptive language that implies preference (still prohibited).
@@ -718,12 +745,12 @@ export default function FairHousingLanguageReferencePage() {
               </p>
 
               <div style={{ background: C.bgCard, border: `1px solid ${C.border}`, borderRadius: "12px", padding: "20px 24px", margin: "20px 0" }}>
-                <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "10px" }}>
-                  <li><strong>First offense:</strong> $25,597</li>
-                  <li><strong>Repeat violation within five years:</strong> $63,991</li>
-                  <li><strong>Third violation within seven years:</strong> $115,054</li>
-                  <li><strong>DOJ pattern-or-practice cases:</strong> Up to $150,000</li>
-                </ul>
+                <BulletList items={[
+                  <><strong>First offense:</strong> $25,597</>,
+                  <><strong>Repeat violation within five years:</strong> $63,991</>,
+                  <><strong>Third violation within seven years:</strong> $115,054</>,
+                  <><strong>DOJ pattern-or-practice cases:</strong> Up to $150,000</>,
+                ]} />
               </div>
 
               <p style={proseStyle}>
@@ -809,17 +836,17 @@ export default function FairHousingLanguageReferencePage() {
               </p>
 
               <p style={{ ...proseStyle, fontWeight: 600, marginBottom: "8px" }}>Prohibited:</p>
-              <ul style={{ ...proseStyle, paddingLeft: "20px", marginTop: 0 }}>
-                <li>&ldquo;Family-friendly,&rdquo; &ldquo;Great for families,&rdquo; &ldquo;Perfect for families&rdquo;</li>
-                <li>&ldquo;Ideal for young families,&rdquo; &ldquo;Family home,&rdquo; &ldquo;Family-oriented community&rdquo;</li>
-                <li>&ldquo;Perfect for kids,&rdquo; &ldquo;Great for children&rdquo;</li>
-                <li>&ldquo;Empty nesters,&rdquo; &ldquo;Perfect for empty nesters&rdquo;</li>
-                <li>&ldquo;Newlywed home,&rdquo; &ldquo;Starter home&rdquo; (increasingly flagged; varies by jurisdiction)</li>
-                <li>&ldquo;Mature couple preferred,&rdquo; &ldquo;Adult living&rdquo; (outside HOPA-compliant senior housing)</li>
-                <li>&ldquo;Adults only&rdquo; (outside HOPA-compliant senior housing)</li>
-                <li>&ldquo;No children,&rdquo; &ldquo;Children welcome&rdquo; (signals preference), &ldquo;Childless&rdquo;</li>
-                <li>&ldquo;Bachelor/bachelorette,&rdquo; &ldquo;Single professional&rdquo;</li>
-              </ul>
+              <BulletList items={[
+                <>&ldquo;Family-friendly,&rdquo; &ldquo;Great for families,&rdquo; &ldquo;Perfect for families&rdquo;</>,
+                <>&ldquo;Ideal for young families,&rdquo; &ldquo;Family home,&rdquo; &ldquo;Family-oriented community&rdquo;</>,
+                <>&ldquo;Perfect for kids,&rdquo; &ldquo;Great for children&rdquo;</>,
+                <>&ldquo;Empty nesters,&rdquo; &ldquo;Perfect for empty nesters&rdquo;</>,
+                <>&ldquo;Newlywed home,&rdquo; &ldquo;Starter home&rdquo; (increasingly flagged; varies by jurisdiction)</>,
+                <>&ldquo;Mature couple preferred,&rdquo; &ldquo;Adult living&rdquo; (outside HOPA-compliant senior housing)</>,
+                <>&ldquo;Adults only&rdquo; (outside HOPA-compliant senior housing)</>,
+                <>&ldquo;No children,&rdquo; &ldquo;Children welcome&rdquo; (signals preference), &ldquo;Childless&rdquo;</>,
+                <>&ldquo;Bachelor/bachelorette,&rdquo; &ldquo;Single professional&rdquo;</>,
+              ]} />
 
               <p style={{ ...proseStyle, fontWeight: 600, marginBottom: "8px" }}>Compliant alternatives:</p>
               <p style={proseStyle}>
@@ -832,19 +859,19 @@ export default function FairHousingLanguageReferencePage() {
               </p>
 
               <p style={{ ...proseStyle, fontWeight: 600, marginBottom: "8px" }}>Prohibited:</p>
-              <ul style={{ ...proseStyle, paddingLeft: "20px", marginTop: 0 }}>
-                <li>Any direct racial reference (&ldquo;white family home,&rdquo; &ldquo;Hispanic neighborhood&rdquo;)</li>
-                <li>Any ethnic reference (&ldquo;Polish neighborhood,&rdquo; &ldquo;Italian community&rdquo;)</li>
-                <li>Any nationality reference (&ldquo;Irish home,&rdquo; &ldquo;Chinese-friendly&rdquo;)</li>
-                <li>&ldquo;Exclusive neighborhood&rdquo; (HUD-flagged coded language)</li>
-                <li>&ldquo;Private community&rdquo; (in advertising; safe in HOA legal descriptions)</li>
-                <li>&ldquo;Integrated&rdquo; (counterintuitively, this is a HUD-listed catch word)</li>
-                <li>&ldquo;Restricted&rdquo; (HUD-listed catch word)</li>
-                <li>&ldquo;Traditional&rdquo; (HUD-listed catch word when used to describe community character)</li>
-                <li>&ldquo;Membership approval&rdquo; / &ldquo;board approval&rdquo; (HUD-listed catch words)</li>
-                <li>&ldquo;Heritage neighborhood&rdquo; / &ldquo;established ethnic community&rdquo;</li>
-                <li>&ldquo;No Section 8&rdquo; (prosecuted in jurisdictions with source-of-income protection; treated as racial proxy in others)</li>
-              </ul>
+              <BulletList items={[
+                <>Any direct racial reference (&ldquo;white family home,&rdquo; &ldquo;Hispanic neighborhood&rdquo;)</>,
+                <>Any ethnic reference (&ldquo;Polish neighborhood,&rdquo; &ldquo;Italian community&rdquo;)</>,
+                <>Any nationality reference (&ldquo;Irish home,&rdquo; &ldquo;Chinese-friendly&rdquo;)</>,
+                <>&ldquo;Exclusive neighborhood&rdquo; (HUD-flagged coded language)</>,
+                <>&ldquo;Private community&rdquo; (in advertising; safe in HOA legal descriptions)</>,
+                <>&ldquo;Integrated&rdquo; (counterintuitively, this is a HUD-listed catch word)</>,
+                <>&ldquo;Restricted&rdquo; (HUD-listed catch word)</>,
+                <>&ldquo;Traditional&rdquo; (HUD-listed catch word when used to describe community character)</>,
+                <>&ldquo;Membership approval&rdquo; / &ldquo;board approval&rdquo; (HUD-listed catch words)</>,
+                <>&ldquo;Heritage neighborhood&rdquo; / &ldquo;established ethnic community&rdquo;</>,
+                <>&ldquo;No Section 8&rdquo; (prosecuted in jurisdictions with source-of-income protection; treated as racial proxy in others)</>,
+              ]} />
 
               <p style={proseStyle}>
                 <strong>Compliant alternatives:</strong> Reference named neighborhoods, specific streets, and verifiable amenities. &ldquo;Located in Highland&rdquo; is safe. &ldquo;Highland&apos;s tight-knit Italian community&rdquo; is not.
@@ -856,13 +883,13 @@ export default function FairHousingLanguageReferencePage() {
               </p>
 
               <p style={{ ...proseStyle, fontWeight: 600, marginBottom: "8px" }}>Prohibited:</p>
-              <ul style={{ ...proseStyle, paddingLeft: "20px", marginTop: 0 }}>
-                <li>&ldquo;Christian community,&rdquo; &ldquo;Jewish neighborhood,&rdquo; &ldquo;Muslim-friendly,&rdquo; &ldquo;Catholic home&rdquo;</li>
-                <li>Any direct religious preference</li>
-                <li>&ldquo;Near churches&rdquo; (when used to characterize community rather than as factual proximity)</li>
-                <li>&ldquo;Walking distance to Temple&rdquo; (combines two flagged elements)</li>
-                <li>&ldquo;Christian school district&rdquo;</li>
-              </ul>
+              <BulletList items={[
+                <>&ldquo;Christian community,&rdquo; &ldquo;Jewish neighborhood,&rdquo; &ldquo;Muslim-friendly,&rdquo; &ldquo;Catholic home&rdquo;</>,
+                <>Any direct religious preference</>,
+                <>&ldquo;Near churches&rdquo; (when used to characterize community rather than as factual proximity)</>,
+                <>&ldquo;Walking distance to Temple&rdquo; (combines two flagged elements)</>,
+                <>&ldquo;Christian school district&rdquo;</>,
+              ]} />
 
               <p style={proseStyle}>
                 <strong>Note:</strong> Holiday greetings (&ldquo;Merry Christmas,&rdquo; &ldquo;Happy Easter&rdquo;) in advertising are NOT violations per HUD guidance. Holiday-themed listings during specific seasons are acceptable. The line is between marketing the property in a religiously affiliated way versus seasonal acknowledgment.
@@ -878,16 +905,16 @@ export default function FairHousingLanguageReferencePage() {
               </p>
 
               <p style={{ ...proseStyle, fontWeight: 600, marginBottom: "8px" }}>Prohibited:</p>
-              <ul style={{ ...proseStyle, paddingLeft: "20px", marginTop: 0 }}>
-                <li>&ldquo;Walking distance&rdquo; (when used as a general descriptor)</li>
-                <li>&ldquo;Short walk to,&rdquo; &ldquo;Stroll to&rdquo;</li>
-                <li>&ldquo;Easy access&rdquo; (when implying ambulatory ease)</li>
-                <li>&ldquo;Active lifestyle community&rdquo; (outside HOPA-compliant active adult)</li>
-                <li>&ldquo;Great for active buyers&rdquo;</li>
-                <li>&ldquo;Able-bodied,&rdquo; &ldquo;No wheelchairs,&rdquo; &ldquo;Wheelchair-bound need not apply&rdquo;</li>
-                <li>&ldquo;Stairs throughout&rdquo; (when implying preference for non-disabled)</li>
-                <li>&ldquo;Felons need not apply&rdquo; (housing-status discrimination in many jurisdictions)</li>
-              </ul>
+              <BulletList items={[
+                <>&ldquo;Walking distance&rdquo; (when used as a general descriptor)</>,
+                <>&ldquo;Short walk to,&rdquo; &ldquo;Stroll to&rdquo;</>,
+                <>&ldquo;Easy access&rdquo; (when implying ambulatory ease)</>,
+                <>&ldquo;Active lifestyle community&rdquo; (outside HOPA-compliant active adult)</>,
+                <>&ldquo;Great for active buyers&rdquo;</>,
+                <>&ldquo;Able-bodied,&rdquo; &ldquo;No wheelchairs,&rdquo; &ldquo;Wheelchair-bound need not apply&rdquo;</>,
+                <>&ldquo;Stairs throughout&rdquo; (when implying preference for non-disabled)</>,
+                <>&ldquo;Felons need not apply&rdquo; (housing-status discrimination in many jurisdictions)</>,
+              ]} />
 
               <p style={proseStyle}>
                 <strong>Compliant alternatives:</strong> Specific distances (&ldquo;0.3 miles from the park&rdquo;), specific architectural facts (&ldquo;single-story floor plan,&rdquo; &ldquo;two-story home&rdquo;), specific accessibility features (&ldquo;zero-step entry,&rdquo; &ldquo;main-floor primary bedroom&rdquo;). The factual description is permitted; the implication of preferred ability is not.
@@ -899,13 +926,13 @@ export default function FairHousingLanguageReferencePage() {
               </p>
 
               <p style={{ ...proseStyle, fontWeight: 600, marginBottom: "8px" }}>Prohibited:</p>
-              <ul style={{ ...proseStyle, paddingLeft: "20px", marginTop: 0 }}>
-                <li>&ldquo;Bachelor pad&rdquo;</li>
-                <li>&ldquo;Man cave&rdquo; (when used as a primary descriptor; safe as informal room reference)</li>
-                <li>&ldquo;She-shed&rdquo; (same nuance)</li>
-                <li>&ldquo;Perfect for single professional women,&rdquo; &ldquo;Ideal for career-minded men&rdquo;</li>
-                <li>&ldquo;Couples only,&rdquo; &ldquo;Single woman/man preferred&rdquo;</li>
-              </ul>
+              <BulletList items={[
+                <>&ldquo;Bachelor pad&rdquo;</>,
+                <>&ldquo;Man cave&rdquo; (when used as a primary descriptor; safe as informal room reference)</>,
+                <>&ldquo;She-shed&rdquo; (same nuance)</>,
+                <>&ldquo;Perfect for single professional women,&rdquo; &ldquo;Ideal for career-minded men&rdquo;</>,
+                <>&ldquo;Couples only,&rdquo; &ldquo;Single woman/man preferred&rdquo;</>,
+              ]} />
 
               <p style={proseStyle}>
                 <strong>Compliant alternatives:</strong> Describe the room or feature. &ldquo;Finished basement,&rdquo; &ldquo;garden shed,&rdquo; &ldquo;home office,&rdquo; &ldquo;private den.&rdquo;
@@ -997,13 +1024,13 @@ export default function FairHousingLanguageReferencePage() {
                 Any &ldquo;perfect for [demographic]&rdquo; formulation is high-risk regardless of which protected class is implicated. The pattern itself signals preference.
               </p>
 
-              <ul style={{ ...proseStyle, paddingLeft: "20px" }}>
-                <li>&ldquo;Perfect for families&rdquo; — prohibited (familial status)</li>
-                <li>&ldquo;Perfect for retirees&rdquo; — prohibited outside HOPA housing</li>
-                <li>&ldquo;Perfect for young professionals&rdquo; — risky (proxy for familial status, age)</li>
-                <li>&ldquo;Perfect for single buyers&rdquo; — risky</li>
-                <li>&ldquo;Perfect for empty nesters&rdquo; — prohibited (familial status)</li>
-              </ul>
+              <BulletList items={[
+                <>&ldquo;Perfect for families&rdquo; — prohibited (familial status)</>,
+                <>&ldquo;Perfect for retirees&rdquo; — prohibited outside HOPA housing</>,
+                <>&ldquo;Perfect for young professionals&rdquo; — risky (proxy for familial status, age)</>,
+                <>&ldquo;Perfect for single buyers&rdquo; — risky</>,
+                <>&ldquo;Perfect for empty nesters&rdquo; — prohibited (familial status)</>,
+              ]} />
 
               <p style={proseStyle}>
                 <strong>The compliant pattern:</strong> Describe the feature, let the buyer determine fit. &ldquo;Three-bedroom layout&rdquo; instead of &ldquo;perfect for a family of five.&rdquo; &ldquo;Single-story design&rdquo; instead of &ldquo;perfect for retirees.&rdquo; &ldquo;Home office and gym&rdquo; instead of &ldquo;perfect for remote workers.&rdquo;
@@ -1028,33 +1055,33 @@ export default function FairHousingLanguageReferencePage() {
               </p>
 
               <h3 style={h3Style}>Property features (always safe)</h3>
-              <ul style={{ ...proseStyle, paddingLeft: "20px" }}>
-                <li>Specific dimensions: square footage, bedrooms, bathrooms, lot size</li>
-                <li>Architectural features: vaulted ceilings, barn doors, exposed beams, crown molding</li>
-                <li>Materials and finishes: quartz counters, hardwood floors, marble surrounds, slate roof</li>
-                <li>Mechanical systems: new HVAC, tankless water heater, solar panels, smart home wiring</li>
-                <li>Outdoor features: fenced yard, covered patio, in-ground pool, outdoor kitchen</li>
-                <li>Storage: walk-in closet, three-car garage, basement storage</li>
-                <li>Layout: open-concept, split-bedroom plan, single-story, two-story</li>
-              </ul>
+              <BulletList items={[
+                "Specific dimensions: square footage, bedrooms, bathrooms, lot size",
+                "Architectural features: vaulted ceilings, barn doors, exposed beams, crown molding",
+                "Materials and finishes: quartz counters, hardwood floors, marble surrounds, slate roof",
+                "Mechanical systems: new HVAC, tankless water heater, solar panels, smart home wiring",
+                "Outdoor features: fenced yard, covered patio, in-ground pool, outdoor kitchen",
+                "Storage: walk-in closet, three-car garage, basement storage",
+                "Layout: open-concept, split-bedroom plan, single-story, two-story",
+              ]} />
 
               <h3 style={h3Style}>Distance and proximity (when specific)</h3>
-              <ul style={{ ...proseStyle, paddingLeft: "20px" }}>
-                <li>Specific distances: &ldquo;0.3 miles to Sloan&apos;s Lake Park&rdquo;</li>
-                <li>Named landmarks: &ldquo;two blocks from Whole Foods on 32nd&rdquo;</li>
-                <li>Transit references: &ldquo;two stops from downtown on the C-line&rdquo;</li>
-                <li>Specific amenity references: &ldquo;adjacent to the Highland Tap &amp; Burger&rdquo;</li>
-                <li>Travel times: &ldquo;12-minute drive to Denver International Airport&rdquo;</li>
-              </ul>
+              <BulletList items={[
+                <>Specific distances: &ldquo;0.3 miles to Sloan&apos;s Lake Park&rdquo;</>,
+                <>Named landmarks: &ldquo;two blocks from Whole Foods on 32nd&rdquo;</>,
+                <>Transit references: &ldquo;two stops from downtown on the C-line&rdquo;</>,
+                <>Specific amenity references: &ldquo;adjacent to the Highland Tap &amp; Burger&rdquo;</>,
+                <>Travel times: &ldquo;12-minute drive to Denver International Airport&rdquo;</>,
+              ]} />
 
               <h3 style={h3Style}>Factual neighborhood references</h3>
-              <ul style={{ ...proseStyle, paddingLeft: "20px" }}>
-                <li>Named neighborhoods: &ldquo;Highland neighborhood&rdquo;</li>
-                <li>Specific named businesses: &ldquo;Whole Foods on 32nd&rdquo;</li>
-                <li>Specific named parks, libraries, transit stops</li>
-                <li>Named schools (post-April 2026 HUD guidance): &ldquo;Edison Elementary&rdquo;</li>
-                <li>Specific school district designations: &ldquo;Denver Public Schools&rdquo;</li>
-              </ul>
+              <BulletList items={[
+                <>Named neighborhoods: &ldquo;Highland neighborhood&rdquo;</>,
+                <>Specific named businesses: &ldquo;Whole Foods on 32nd&rdquo;</>,
+                <>Specific named parks, libraries, transit stops</>,
+                <>Named schools (post-April 2026 HUD guidance): &ldquo;Edison Elementary&rdquo;</>,
+                <>Specific school district designations: &ldquo;Denver Public Schools&rdquo;</>,
+              ]} />
 
               <h3 style={h3Style}>Primary bedroom note</h3>
               <p style={proseStyle}>
@@ -1062,13 +1089,13 @@ export default function FairHousingLanguageReferencePage() {
               </p>
 
               <h3 style={h3Style}>Factual school and crime data (April 2026 update)</h3>
-              <ul style={{ ...proseStyle, paddingLeft: "20px" }}>
-                <li>&ldquo;GreatSchools rating: [specific rating]&rdquo;</li>
-                <li>&ldquo;Within [Specific] School District&rdquo;</li>
-                <li>&ldquo;Crime statistics available at [data source]&rdquo;</li>
-                <li>&ldquo;Local crime data: see [source]&rdquo;</li>
-                <li>&ldquo;School district report card available&rdquo;</li>
-              </ul>
+              <BulletList items={[
+                <>&ldquo;GreatSchools rating: [specific rating]&rdquo;</>,
+                <>&ldquo;Within [Specific] School District&rdquo;</>,
+                <>&ldquo;Crime statistics available at [data source]&rdquo;</>,
+                <>&ldquo;Local crime data: see [source]&rdquo;</>,
+                <>&ldquo;School district report card available&rdquo;</>,
+              ]} />
               <p style={proseStyle}>
                 These references are acceptable per HUD&apos;s April 2026 Dear Colleague letter when shared consistently across all clients.
               </p>
@@ -1216,6 +1243,24 @@ export default function FairHousingLanguageReferencePage() {
           </div>
         </section>
 
+        {/* ── SOURCES FOOTER ── */}
+        <section style={{ background: C.cream, padding: "40px 0" }}>
+          <div className={CONTENT}>
+            <div className={READING}>
+              <p style={{
+                fontFamily: "var(--font-jetbrains, monospace)",
+                fontSize: "12px",
+                lineHeight: 1.6,
+                color: C.muted,
+                textAlign: "center",
+                fontStyle: "italic",
+              }}>
+                Sources: HUD Office of Fair Housing and Equal Opportunity Dear Colleague letter, April 24, 2026; 24 CFR Part 100; 42 USC § 3604(c); HUD Civil Penalties Inflation Adjustment (24 CFR § 180.671, March 2024 adjustment); NAR Fair Housing Act overview, 2026. This reference is informational and not legal advice.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {/* ── CLOSING / FINAL CTA — DARK FOREST ── */}
         <section style={{ background: C.forestDeep, padding: "80px 0", position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(rgba(184,153,104,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(184,153,104,0.06) 1px, transparent 1px)", backgroundSize: "32px 32px", pointerEvents: "none" }} />
@@ -1264,24 +1309,6 @@ export default function FairHousingLanguageReferencePage() {
                 Try the Fair Housing Checker
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* ── SOURCES FOOTER ── */}
-        <section style={{ background: C.cream, padding: "40px 0" }}>
-          <div className={CONTENT}>
-            <div className={READING}>
-              <p style={{
-                fontFamily: "var(--font-jetbrains, monospace)",
-                fontSize: "12px",
-                lineHeight: 1.6,
-                color: C.muted,
-                textAlign: "center",
-                fontStyle: "italic",
-              }}>
-                Sources: HUD Office of Fair Housing and Equal Opportunity Dear Colleague letter, April 24, 2026; 24 CFR Part 100; 42 USC § 3604(c); HUD Civil Penalties Inflation Adjustment (24 CFR § 180.671, March 2024 adjustment); NAR Fair Housing Act overview, 2026. This reference is informational and not legal advice.
-              </p>
             </div>
           </div>
         </section>
