@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { ComplianceCheckClient } from "./ComplianceCheckClient";
 
 export const metadata: Metadata = {
-  title: "Free Fair Housing Compliance Checker for Real Estate Agents | metes",
+  title: "Fair Housing Compliance Software for Real Estate Agents | Free Tool",
   description:
-    "Free AI tool that scans your MLS description for Fair Housing violations in 3 seconds. Catches accidental discriminatory language before HUD does. No signup required.",
+    "Free Fair Housing compliance software for real estate agents. Scan your MLS description in 3 seconds. Catches violations before HUD does. No signup required.",
   keywords: [
     "fair housing compliance",
     "FHA compliance checker",
