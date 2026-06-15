@@ -1,5 +1,6 @@
 "use client";
 
+import posthog from "posthog-js";
 import { useState, useEffect, useRef } from "react";
 import { Turnstile } from "@marsidev/react-turnstile";
 import Link from "next/link";
@@ -119,6 +120,15 @@ export function NeighborhoodToolClient() {
   const [result, setResult] = useState<NeighborhoodResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [runsUsed, setRunsUsed] = useState(0);
+
+  useEffect(() => {
+    if (status === "email_gate") {
+      posthog.capture("email_gate_shown", {
+        tool_name: "neighborhood_guide",
+        runs_used: runsUsed,
+      });
+    }
+  }, [status, runsUsed]);
   const [copied, setCopied] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string>("");
 
@@ -296,7 +306,12 @@ export function NeighborhoodToolClient() {
                       className="min-w-[200px] flex-1 rounded-lg border border-[rgba(20,39,30,0.18)] bg-[#F4F0E8] px-3.5 py-2.5 font-manrope text-[13px] text-[#14271E] outline-none"
                     />
                     <button
-                      onClick={() => handleGenerate(email)}
+                      onClick={() => {
+                        posthog.capture("email_gate_submitted", {
+                          tool_name: "neighborhood_guide",
+                        });
+                        handleGenerate(email);
+                      }}
                       disabled={!email.trim() || !turnstileToken}
                       className={`inline-flex items-center gap-2 rounded-lg bg-[#1F3D2E] px-5 py-2.5 font-manrope text-[13px] font-medium text-[#F4F0E8] ${
                         !email.trim() ? "cursor-not-allowed opacity-50" : "hover:opacity-90"
@@ -371,6 +386,11 @@ export function NeighborhoodToolClient() {
                     </p>
                     <Link
                       href="/"
+                      onClick={() => posthog.capture("tool_cta_clicked", {
+                        source_tool: "neighborhood_guide",
+                        cta_label: "See what else Metes generates — $35",
+                        result_state: "success_inline",
+                      })}
                       className="inline-flex items-center gap-2 rounded-lg bg-[#1F3D2E] px-5 py-2.5 font-manrope text-[13px] font-medium text-[#F4F0E8] no-underline hover:opacity-90"
                     >
                       See what else Metes generates — $35
@@ -616,6 +636,11 @@ export function NeighborhoodToolClient() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/"
+                onClick={() => posthog.capture("tool_cta_clicked", {
+                  source_tool: "neighborhood_guide",
+                  cta_label: "Generate the full listing kit — $35",
+                  result_state: "forest_section",
+                })}
                 className="inline-flex items-center gap-2 rounded-[9px] bg-[#B89968] px-7 py-3.5 font-manrope text-[14px] font-medium text-[#14271E] no-underline transition-colors hover:bg-[#9A7E50] hover:text-[#F4F0E8]"
               >
                 Generate the full listing kit — $35
@@ -623,6 +648,11 @@ export function NeighborhoodToolClient() {
               </Link>
               <Link
                 href="/compliance-audit"
+                onClick={() => posthog.capture("tool_cta_clicked", {
+                  source_tool: "neighborhood_guide",
+                  cta_label: "See the compliance audit",
+                  result_state: "forest_section_secondary",
+                })}
                 className="inline-flex items-center gap-2 rounded-[9px] border border-[rgba(244,240,232,0.3)] bg-transparent px-7 py-3.5 font-manrope text-[14px] font-medium text-[#F4F0E8] no-underline hover:border-[rgba(244,240,232,0.6)]"
               >
                 See the compliance audit

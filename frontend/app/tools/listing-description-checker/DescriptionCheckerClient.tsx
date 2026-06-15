@@ -1,5 +1,6 @@
 "use client";
 
+import posthog from "posthog-js";
 import { useState, useEffect, useRef } from "react";
 import { Turnstile } from "@marsidev/react-turnstile";
 import Link from "next/link";
@@ -112,6 +113,15 @@ export function DescriptionCheckerClient() {
   const [result, setResult] = useState<DiagnosticResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [runsUsed, setRunsUsed] = useState(0);
+
+  useEffect(() => {
+    if (status === "email_gate") {
+      posthog.capture("email_gate_shown", {
+        tool_name: "description_checker",
+        runs_used: runsUsed,
+      });
+    }
+  }, [status, runsUsed]);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
   const [turnstileToken, setTurnstileToken] = useState<string>("");
 
@@ -316,7 +326,12 @@ export function DescriptionCheckerClient() {
                       className="min-w-[200px] flex-1 rounded-lg border border-[rgba(20,39,30,0.18)] bg-[#F4F0E8] px-3.5 py-2.5 font-manrope text-[13px] text-[#14271E] outline-none"
                     />
                     <button
-                      onClick={() => handleScan(email)}
+                      onClick={() => {
+                        posthog.capture("email_gate_submitted", {
+                          tool_name: "description_checker",
+                        });
+                        handleScan(email);
+                      }}
                       disabled={!email.trim() || !turnstileToken}
                       className={`inline-flex items-center gap-2 rounded-lg bg-[#1F3D2E] px-5 py-2.5 font-manrope text-[13px] font-medium text-[#F4F0E8] ${
                         !email.trim() ? "cursor-not-allowed opacity-50" : "hover:opacity-90"
@@ -419,6 +434,11 @@ export function DescriptionCheckerClient() {
                     </p>
                     <Link
                       href="/"
+                      onClick={() => posthog.capture("tool_cta_clicked", {
+                        source_tool: "description_checker",
+                        cta_label: "See what else Metes generates — $35",
+                        result_state: "success_inline",
+                      })}
                       className="inline-flex items-center gap-2 rounded-lg bg-[#1F3D2E] px-5 py-2.5 font-manrope text-[13px] font-medium text-[#F4F0E8] no-underline hover:opacity-90"
                     >
                       See what else Metes generates — $35

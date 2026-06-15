@@ -34,6 +34,7 @@ from typing import Any, Optional
 
 import httpx
 import redis
+from contextlib import asynccontextmanager
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -60,6 +61,27 @@ from services.description_diagnostic_service import (
 load_dotenv()
 import logging
 logging.basicConfig(level=logging.INFO)
+
+import posthog as _posthog
+
+_POSTHOG_TOKEN = os.getenv("POSTHOG_PROJECT_TOKEN", "")
+_POSTHOG_HOST = os.getenv("POSTHOG_HOST", "https://us.i.posthog.com")
+if _POSTHOG_TOKEN:
+    _posthog.api_key = _POSTHOG_TOKEN
+    _posthog.host = _POSTHOG_HOST
+    _posthog.enable_exception_autocapture = True
+
+
+def _ph_capture(distinct_id: str, event: str, properties: dict | None = None) -> None:
+    """Capture a PostHog event, silently skipping if PostHog is not configured."""
+    if not _POSTHOG_TOKEN:
+        return
+    _posthog.capture(distinct_id, event, properties or {})
+
+
+def _ip_id(ip: str) -> str:
+    """Return a stable anonymous distinct ID derived from an IP address."""
+    return "ip:" + hashlib.sha256(ip.encode()).hexdigest()[:16]
 
 
 def _resize_images(
@@ -93,10 +115,18 @@ GOOGLE_PLACES_API_KEY = os.getenv("GOOGLE_PLACES_API_KEY")
 # App setup
 # ---------------------------------------------------------------------------
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
+    if _POSTHOG_TOKEN:
+        _posthog.flush()
+
+
 app = FastAPI(
     title="ListingLogicAI API",
     description="AI-powered listing marketing engine for high-performing agents.",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -591,6 +621,12 @@ async def generate(session_id: str, request: Request):
     session["updated_at"] = time.time()
     _write_session(session)
 
+    _ph_capture(session_id, "generation_started", {
+        "email_tone": email_tone,
+        "has_property_edits": bool(body.get("property")),
+        "has_feature_edits": bool(body.get("detectedFeatures")),
+    })
+
     asyncio.create_task(_run_generation(session_id, email_tone))
 
     return {"sessionId": session_id, "status": "generating"}
@@ -628,11 +664,20 @@ async def _run_generation(session_id: str, email_tone: str):
         session["updated_at"] = time.time()
         _write_session(session)
 
+        compliance_list = results.get("compliance_results", [])
+        _ph_capture(session_id, "generation_completed", {
+            "has_social_posts": bool(results.get("social_posts")),
+            "has_emails": bool(results.get("email_campaign")),
+            "compliance_total": len(compliance_list),
+            "compliance_flagged": sum(1 for r in compliance_list if r.status == "flagged"),
+        })
+
     except Exception as e:
         session["generation_status"] = "error"
         session["generation_error"] = str(e)
         session["updated_at"] = time.time()
         _write_session(session)
+        _ph_capture(session_id, "generation_failed", {"error_type": type(e).__name__})
 
 
 async def _run_extraction(session_id: str, notes: str, image_data: list[tuple[bytes, str]]):
@@ -673,6 +718,13 @@ async def _run_extraction(session_id: str, notes: str, image_data: list[tuple[by
         _write_session(session)
         print(f"[EXTRACT] Complete for session {session_id}")
 
+        _ph_capture(session_id, "listing_extracted", {
+            "image_count": len(image_data),
+            "has_images": len(image_data) > 0,
+            "address_city": getattr(details, "city", None),
+            "address_state": getattr(details, "state", None),
+        })
+
         # Fire background tasks — user is now on review page
         if image_data:
             asyncio.create_task(_run_captions_and_rename(session_id))
@@ -684,6 +736,7 @@ async def _run_extraction(session_id: str, notes: str, image_data: list[tuple[by
         session["generation_error"] = str(e)
         session["updated_at"] = time.time()
         _write_session(session)
+        _ph_capture(session_id, "extraction_failed", {"error_type": type(e).__name__})
 
 
 async def _run_captions_and_rename(session_id: str):
@@ -881,6 +934,8 @@ async def download(session_id: str, token: str):
         if address else "listing_package.zip"
     )
 
+    _ph_capture(session_id, "listing_downloaded", {"purchase_type": session.get("paid", "none")})
+
     return Response(
         content=zip_bytes,
         media_type="application/zip",
@@ -915,6 +970,8 @@ async def create_checkout(session_id: str, request: Request):
     session["agent_email"] = agent_email
     session["updated_at"] = time.time()
     _write_session(session)
+
+    _ph_capture(session_id, "checkout_initiated", {"purchase_type": purchase_type})
 
     if not STRIPE_SECRET_KEY:
         # Dev mode — simulate checkout without Stripe
@@ -1032,6 +1089,11 @@ async def stripe_webhook(request: Request):
                 s["download_token_created_at"] = time.time()
                 _write_session(s)
 
+                _ph_capture(session_id, "payment_completed", {"purchase_type": purchase_type})
+                if agent_email and _POSTHOG_TOKEN:
+                    _posthog.identify(agent_email, {"email": agent_email})
+                    _posthog.alias(session_id, agent_email)
+
                 # Send listing delivery email — fire and forget
                 if agent_email:
                     from services.email_service import send_listing_delivery_email
@@ -1060,6 +1122,17 @@ async def stripe_webhook(request: Request):
                         _write_session(s)
 
                     asyncio.create_task(_enhance_and_persist(session_id, s))
+
+    elif event["type"] == "checkout.session.expired":
+        stripe_session = event["data"]["object"]
+        metadata = stripe_session["metadata"] if "metadata" in stripe_session else {}
+        session_id = metadata["session_id"] if "session_id" in metadata else None
+        purchase_type = metadata["purchase_type"] if "purchase_type" in metadata else "listing"
+
+        if session_id:
+            _ph_capture(session_id, "checkout_abandoned", {
+                "purchase_type": purchase_type,
+            })
 
     return {"received": True}
 
@@ -1235,6 +1308,7 @@ async def compliance_check_tool(
     # IP gate
     gate = check_compliance_ip_gate(ip, email, _redis_client)
     if not gate["allowed"]:
+        _ph_capture(_ip_id(ip), "tool_gate_hit", {"tool_name": "compliance_check", "runs_used": gate["runs_used"]})
         raise HTTPException(
             status_code=402,
             detail={
@@ -1242,6 +1316,11 @@ async def compliance_check_tool(
                 "runs_used": gate["runs_used"],
             },
         )
+
+    _ph_capture(_ip_id(ip), "compliance_check_attempted", {
+        "tool_name": "compliance_check",
+        "text_length": len(text),
+    })
 
     # Pre-screen
     is_real_estate = await pre_screen_compliance_input(text, API_KEY)
@@ -1258,6 +1337,13 @@ async def compliance_check_tool(
 
     # Increment run count
     increment_compliance_run_count(ip, _redis_client)
+
+    _ph_capture(_ip_id(ip), "compliance_check_run", {
+        "tool_name": "compliance_check",
+        "text_length": len(text),
+        "result_status": result.status,
+        "issues_found": len(result.issues_found) if result.issues_found else 0,
+    })
 
     return {
         "status": result.status,
@@ -1300,6 +1386,7 @@ async def neighborhood_guide_tool(
     # IP gate
     gate = check_neighborhood_ip_gate(ip, email, _redis_client)
     if not gate["allowed"]:
+        _ph_capture(_ip_id(ip), "tool_gate_hit", {"tool_name": "neighborhood_guide", "runs_used": gate["runs_used"]})
         raise HTTPException(
             status_code=402,
             detail={
@@ -1307,6 +1394,11 @@ async def neighborhood_guide_tool(
                 "runs_used": gate["runs_used"],
             },
         )
+
+    _ph_capture(_ip_id(ip), "neighborhood_guide_attempted", {
+        "tool_name": "neighborhood_guide",
+        "address_length": len(address) if address else 0,
+    })
 
     # Geocoding as input guard + Places pipeline
     try:
@@ -1344,6 +1436,11 @@ async def neighborhood_guide_tool(
 
     # Increment run count
     increment_neighborhood_run_count(ip, _redis_client)
+
+    _ph_capture(_ip_id(ip), "neighborhood_guide_generated", {
+        "tool_name": "neighborhood_guide",
+        "places_count": len(neighborhood_context.places),
+    })
 
     return {
         "address": address,
@@ -1384,6 +1481,7 @@ async def description_checker_tool(
     # IP gate
     gate = check_diagnostic_ip_gate(ip, email, _redis_client)
     if not gate["allowed"]:
+        _ph_capture(_ip_id(ip), "tool_gate_hit", {"tool_name": "description_checker", "runs_used": gate["runs_used"]})
         raise HTTPException(
             status_code=402,
             detail={
@@ -1391,6 +1489,11 @@ async def description_checker_tool(
                 "runs_used": gate["runs_used"],
             },
         )
+
+    _ph_capture(_ip_id(ip), "description_check_attempted", {
+        "tool_name": "description_checker",
+        "char_count": len(description),
+    })
 
     # Run diagnostic chain
     try:
@@ -1408,6 +1511,12 @@ async def description_checker_tool(
 
     # Increment run count
     increment_diagnostic_run_count(ip, _redis_client)
+
+    _ph_capture(_ip_id(ip), "description_check_run", {
+        "tool_name": "description_checker",
+        "char_count": len(description),
+        "overall_score": getattr(diagnostic, "overall_score", None),
+    })
 
     return {
         "diagnostic": diagnostic.model_dump(),
