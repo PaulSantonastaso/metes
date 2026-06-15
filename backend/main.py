@@ -67,7 +67,7 @@ import posthog as _posthog
 _POSTHOG_TOKEN = os.getenv("POSTHOG_PROJECT_TOKEN", "")
 _POSTHOG_HOST = os.getenv("POSTHOG_HOST", "https://us.i.posthog.com")
 if _POSTHOG_TOKEN:
-    _posthog.api_key = _POSTHOG_TOKEN
+    _posthog.project_api_key = _POSTHOG_TOKEN
     _posthog.host = _POSTHOG_HOST
     _posthog.enable_exception_autocapture = True
 
