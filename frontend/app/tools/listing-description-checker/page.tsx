@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { DescriptionCheckerClient } from "./DescriptionCheckerClient";
 
 export const metadata: Metadata = {
-  title: "Free Listing Description Checker — MLS Quality Analyzer",
+  title: "Listing Description Checker — Free MLS Listing Analyzer",
   description:
-    "Paste your MLS listing description and get instant feedback on hook strength, AI tells, clichés, length, and more. Free, no signup for first 3 scans.",
+    "Free listing description checker for real estate agents. Catches AI tells, clichés, weak hooks, and length issues against 7 craft criteria. No signup for first 3 scans.",
   keywords: [
     "listing description checker",
     "real estate description analyzer",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Free Listing Description Checker",
     description:
-      "Get instant feedback on your MLS description. Catches AI tells, real estate clichés, weak hooks, and length issues. Free.",
+      "Free tool for real estate agents. Catches AI tells, clichés, weak hooks, and length issues. No signup for first 3 scans.",
     url: "https://www.metes.app/tools/listing-description-checker",
     siteName: "metes",
     type: "website",

@@ -6,9 +6,9 @@ import { NeighborhoodToolClient } from "./NeighborhoodToolClient";
 // ─────────────────────────────────────────────────────────────────
 
 export const metadata: Metadata = {
-  title: "Free Neighborhood Description Generator for Real Estate Listings | metes",
+  title: "Free Neighborhood Description Generator for MLS Listings | Metes",
   description:
-    "Free AI tool that builds a multi-section neighborhood guide for any MLS listing. Type an address, get a lifestyle paragraph plus categorical breakdowns powered by live local data. Fair Housing-aware, MLS-character-safe. No signup for your first three generations.",
+    "Free neighborhood description generator for MLS listings. Type an address, get a lifestyle paragraph powered by live local data. Fair Housing-aware, MLS-ready.",
   keywords: [
     "neighborhood description generator",
     "MLS neighborhood description",

@@ -5,9 +5,9 @@ import { Composer } from "@/components/home/Composer";
 import Footer from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
-  title: "Automate MLS Listing Descriptions and Social Posts in 60 Seconds | metes",
+  title: "MLS Listing Descriptions + Social Posts in 60 Seconds | Metes",
   description:
-    "Turn messy notes and raw photos into FHA-compliant MLS descriptions, sorted image galleries, and ready-to-post social media. Generate your complete real estate marketing kit in under 60 seconds. $35 per listing.",
+    "AI-powered MLS descriptions, sorted photo galleries, and social posts in 60 seconds. Fair Housing-compliant, built for solo real estate agents. $35 per listing.",
   keywords: [
     "MLS listing description",
     "AI listing description generator",
