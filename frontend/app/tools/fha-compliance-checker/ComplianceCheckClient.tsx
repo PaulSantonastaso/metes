@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import posthog from "posthog-js";
+import { useEffect, useState } from "react";
 import { Turnstile } from "@marsidev/react-turnstile";
 import Link from "next/link";
 import { Loader2, AlertTriangle, CheckCircle2, ArrowRight } from "lucide-react";
@@ -189,6 +190,15 @@ export function ComplianceCheckClient() {
   const [runsUsed, setRunsUsed] = useState(0);
   const [turnstileToken, setTurnstileToken] = useState<string>("");
 
+  useEffect(() => {
+    if (scanStatus === "email_gate") {
+      posthog.capture("email_gate_shown", {
+        tool_name: "compliance_check",
+        runs_used: runsUsed,
+      });
+    }
+  }, [scanStatus, runsUsed]);
+
   const handleScan = async (overrideEmail?: string) => {
     if (!text.trim() || scanStatus === "loading") return;
     setScanStatus("loading");
@@ -341,7 +351,12 @@ export function ComplianceCheckClient() {
                       className="min-w-[200px] flex-1 rounded-lg border border-[rgba(20,39,30,0.18)] bg-[#F4F0E8] px-3.5 py-2.5 font-manrope text-[13px] text-[#14271E] outline-none"
                     />
                     <button
-                      onClick={() => handleScan(email)}
+                      onClick={() => {
+                        posthog.capture("email_gate_submitted", {
+                          tool_name: "compliance_check",
+                        });
+                        handleScan(email);
+                      }}
                       disabled={!email.trim()}
                       className={`inline-flex items-center gap-2 rounded-lg bg-[#1F3D2E] px-5 py-2.5 font-manrope text-[13px] font-medium text-[#F4F0E8] ${
                         !email.trim()
@@ -406,6 +421,11 @@ export function ComplianceCheckClient() {
                     </p>
                     <Link
                       href="/"
+                      onClick={() => posthog.capture("tool_cta_clicked", {
+                        source_tool: "compliance_check",
+                        cta_label: "Generate a compliant listing kit — $35",
+                        result_state: "flagged",
+                      })}
                       className="inline-flex items-center gap-2 rounded-[9px] bg-[#1F3D2E] px-6 py-3 font-manrope text-[13px] font-medium text-[#F4F0E8] no-underline hover:opacity-90"
                     >
                       Generate a compliant listing kit — $35
@@ -437,6 +457,11 @@ export function ComplianceCheckClient() {
                     </p>
                     <Link
                       href="/"
+                      onClick={() => posthog.capture("tool_cta_clicked", {
+                        source_tool: "compliance_check",
+                        cta_label: "Upgrade to the full kit — $35",
+                        result_state: "passed",
+                      })}
                       className="inline-flex items-center gap-2 rounded-[9px] bg-[#1F3D2E] px-6 py-3 font-manrope text-[13px] font-medium text-[#F4F0E8] no-underline hover:opacity-90"
                     >
                       Upgrade to the full kit — $35
@@ -536,6 +561,11 @@ export function ComplianceCheckClient() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/"
+                onClick={() => posthog.capture("tool_cta_clicked", {
+                  source_tool: "compliance_check",
+                  cta_label: "Generate your listing kit — $35",
+                  result_state: "forest_section",
+                })}
                 className="inline-flex items-center gap-2 rounded-[9px] bg-[#B89968] px-7 py-3.5 font-manrope text-[14px] font-medium text-[#14271E] no-underline transition-colors hover:bg-[#9A7E50] hover:text-[#F4F0E8]"
               >
                 Generate your listing kit — $35
