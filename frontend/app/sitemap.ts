@@ -39,6 +39,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: "https://www.metes.app/compare/metes-vs-chatgpt",
+      lastModified: new Date("2026-06-17"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: "https://www.metes.app/tools/fha-compliance-checker",
       lastModified: new Date(),
       changeFrequency: "monthly",
