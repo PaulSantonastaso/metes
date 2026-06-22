@@ -93,6 +93,13 @@ PROPERTY ADDRESS:
 NEARBY PLACES (from live Google Places data — name, category, rating, review count):
 {places_formatted}
 
+Use the rating and review count to calibrate confidence:
+  - 4.5+ rating with 500+ reviews → established local standard, can describe with confidence
+  - 4.5+ rating with 50-500 reviews → solid local favorite
+  - 4.0-4.5 rating with many reviews → reliable but unremarkable
+  - Under 4.0 or very few reviews → mention sparingly, do not lead with
+  - No rating data → describe by category only, no strength signals
+
 YOUR TASK — produce a curated, multi-section neighborhood guide.
 
 ═══════════════════════════════════════════════════════════════
@@ -129,12 +136,26 @@ Bucket eligibility by category:
 For each section, select 3-5 of the strongest places. Each place appears in only one section.
 Quality over quantity — if a section has fewer than 3 worthwhile places, include only those. If it has none, leave it empty.
 
-For each selected place, write a one-line description (8-15 words) — lifestyle-forward, specific, no distances or drive times.
+For each selected place, write a one-line description (8-15 words). Each description must reference something specific that distinguishes this place from a generic equivalent — its specialty, its signature item, its role in the community, its history, or its specific category identity. Use the rating and review count signals to calibrate language (highly-rated with many reviews = established local standard; newer with strong rating = emerging favorite).
 
-Example descriptions:
+Banned description patterns (these blur every place into the same template):
+  - "[adjective] [place-type] offering [adjective] [noun] in a [adjective] setting"
+  - "A neighborhood favorite known for..."
+  - "High-quality [anything]"
+  - "Expertly crafted [anything]"
+  - "Dedicated studio offering..."
+
+Good descriptions (specific, earn their words):
   - "Local roaster pulling some of the city's best espresso since 2014."
   - "Quiet 40-acre park with paved loop trail and shaded picnic pavilions."
   - "Chef-driven Italian, handmade pasta, the kind of place locals book early."
+  - "Australian-style roaster known for technical brewing and seasonal single-origins."
+  - "Hand-rolled bagels, a morning ritual that runs out by 11am on weekends."
+
+Weak descriptions (interchangeable with any other place):
+  - "Independent coffee shop serving high-quality roasts in a welcoming setting."
+  - "Dedicated studio offering challenging classes for all levels."
+  - "Premium fitness facility with modern equipment."
 
 ═══════════════════════════════════════════════════════════════
 STEP 2 — WRITE mls_insert
@@ -157,7 +178,20 @@ This must fit the MLS community/neighborhood field on most MLS systems.
 Reads like a local recommending the area to a friend. Specific, evocative, conversational.
 Not a bulleted list. May reference places that also appear in the bulleted sections — that's expected.
 
-Example (398 chars): "Westover Hills sits on Orlando's quiet west side, where tree-lined streets meet genuine neighborhood character. Foxtail Coffee is two blocks north — the kind of place regulars know by name. Lake Weston Park is a five-minute walk for morning runs or weekend afternoons, and Whole Foods anchors the daily routine."
+The opening sentence is the highest-leverage moment. It must reference a specific place, a specific moment, or a specific factual detail — never an abstract characterization. Do NOT open with "Living here," "Life here," "Daily life," "This neighborhood," or any variant where the first noun is the neighborhood itself paired with an abstract verb ("centers on," "balances," "embraces," "is defined by"). Lead with a named place or a concrete sensory detail instead.
+
+Good opening patterns:
+  - "Foxtail Coffee opens at 6am, and most weekday mornings the line stretches past the door."
+  - "Two blocks from Lake Weston Park and three from the Whole Foods on Edgewater."
+  - "Sunday mornings start at the Hollywood Farmers Market — produce from regional growers, prepared food from rotating local vendors."
+
+Bad opening patterns (banned):
+  - "Living here means embracing the best of [neighborhood]'s [adjective] culture."
+  - "[Neighborhood] balances [abstract noun] with [abstract noun]."
+  - "Life in [neighborhood] centers on [abstract noun]."
+  - "Daily routines are defined by..."
+
+Example (398 chars): "Foxtail Coffee opens at 6am two blocks north — the kind of place regulars know by name. Lake Weston Park is a five-minute walk for morning runs or weekend afternoons, and Whole Foods anchors the daily routine. Westover Hills sits on Orlando's quiet west side, where tree-lined streets meet genuine neighborhood character."
 
 ═══════════════════════════════════════════════════════════════
 STEP 4 — populate selected_places
@@ -171,9 +205,11 @@ HARD RULES
 
 - Only mention places from the provided list. Never invent places or features.
 - Do not describe demographics, schools, religious institutions, or who lives there.
-- Do not use the words "nestled", "charming", "vibrant", "trendy", or "up-and-coming".
+- Do not use these words or phrases anywhere in output: "nestled", "charming", "vibrant", "trendy", "up-and-coming", "balanced", "balance of", "balanced pace", "centers on", "defined by", "embracing the best of", "embraces", "high-quality", "expertly", "expertly crafted", "refined", "welcoming", "dedicated", "variety of", "renowned", "expansive", "perfect for", "ideal", "iconic" (unless the place is genuinely iconic, e.g. "the iconic Pineapple Fountain"), "elevated" as filler, "curated" as filler.
+- Do not open lifestyle_paragraph with "Living here", "Life here", "Daily life", or any variant of "[neighborhood] [verb-phrase] [abstract noun pair]". Open with a specific place, sensory moment, or factual detail about the neighborhood. The opening sentence must reference something specific to THIS neighborhood, not a template that could describe any neighborhood.
 - Use proximity language ("nearby", "close by", "a short drive", "a few minutes away") — not specific drive times or distances in miles. Reserve "steps from" and "walking distance" for places that truly are within walking range; the candidate list spans up to 2.5 miles.
 - If the list contains nothing worth highlighting, return empty strings for mls_insert and lifestyle_paragraph and empty lists for all four sections.
+- LOW-DENSITY MARKETS: If fewer than 6 total places are available, do NOT pad with weak entries. Instead, write MORE depth per place (fully use the 8-15 word description budget for each), and write the lifestyle_paragraph around the named community itself (e.g., "Sun City West," "The Villages," "Briar Chapel") rather than implying commercial density that doesn't exist. Reference the planned/intentional character of the community when applicable. The strongest output from a thin candidate list is fewer-but-deeper, not more-but-thinner.
 - Fair Housing: lifestyle and amenity focus only. No demographic implications."""
 
 
@@ -181,7 +217,7 @@ def build_neighborhood_chain(api_key: str):
     llm = ChatGoogleGenerativeAI(
         model="gemini-3.1-flash-lite",
         google_api_key=api_key,
-        temperature=0.5,
+        temperature=0.3,
     )
 
     structured_llm = llm.with_structured_output(NeighborhoodOutput)
