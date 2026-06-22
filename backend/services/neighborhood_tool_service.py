@@ -20,7 +20,7 @@ def _tool_neighborhood_key(ip: str) -> str:
 
 
 def _tool_email_key(ip: str) -> str:
-    return f"tool:email:{ip}"
+    return f"tool:email:neighborhood:{ip}"
 
 
 def check_ip_gate(ip: str, email: str | None, redis_client) -> dict:
@@ -38,6 +38,11 @@ def check_ip_gate(ip: str, email: str | None, redis_client) -> dict:
     if email and not email_on_file:
         redis_client.setex(email_key, TOOL_TTL, email.encode())
         email_on_file = True
+        try:
+            from services.r2_service import save_email_capture
+            save_email_capture(email, ip, "neighborhood_guide")
+        except Exception as e:
+            logger.error(f"[NEIGHBORHOOD TOOL] R2 email save failed: {e}")
 
     allowed = runs_used < TOOL_RUN_LIMIT or email_on_file
 
