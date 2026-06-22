@@ -410,3 +410,49 @@ def _serialize_images(intelligence, results=None) -> list:
     except Exception as e:
         logger.error(f"[R2] _serialize_images failed: {e}")
         return []
+
+
+# ---------------------------------------------------------------------------
+# Email capture — persisted to R2 for lead-gen
+# ---------------------------------------------------------------------------
+
+def save_email_capture(email: str, ip: str, tool_name: str) -> bool:
+    """
+    Persists captured email to R2 as a JSON record.
+    Each capture writes its own timestamped file so we never lose leads.
+    Returns True on success, False on failure (never raises).
+
+    R2 key: tool_emails/{tool_name}/{timestamp}_{ip_hash}.json
+    """
+    s3 = _get_s3_client()
+    if not s3:
+        logger.warning("[R2] Stub mode — skipping email capture save")
+        return False
+
+    import hashlib
+    import time
+
+    timestamp = int(time.time())
+    ip_hash = hashlib.sha256(ip.encode()).hexdigest()[:16]
+    r2_key = f"tool_emails/{tool_name}/{timestamp}_{ip_hash}.json"
+
+    record = {
+        "email": email,
+        "ip_hash": ip_hash,
+        "tool_name": tool_name,
+        "captured_at": timestamp,
+        "captured_at_iso": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(timestamp)),
+    }
+
+    try:
+        s3.put_object(
+            Bucket=_bucket(),
+            Key=r2_key,
+            Body=json.dumps(record).encode("utf-8"),
+            ContentType="application/json",
+        )
+        logger.info(f"[R2] Email capture saved — {tool_name} / {ip_hash}")
+        return True
+    except Exception as e:
+        logger.error(f"[R2] Failed to save email capture: {e}")
+        return False
