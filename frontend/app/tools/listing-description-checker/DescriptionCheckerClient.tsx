@@ -138,6 +138,14 @@ export function DescriptionCheckerClient() {
 
   const handleScan = async (overrideEmail?: string) => {
     if (!description.trim() || status === "loading") return;
+
+    posthog.capture("description_checker_submitted", {
+      tool_name: "description_checker",
+      char_count: description.trim().length,
+      has_email: !!(overrideEmail || email),
+      has_turnstile_token: !!turnstileToken,
+    });
+
     setStatus("loading");
     setResult(null);
     setErrorMsg(null);
@@ -158,6 +166,12 @@ export function DescriptionCheckerClient() {
         const data = await res.json();
         setRunsUsed(data.detail?.runs_used ?? 3);
         setStatus("email_gate");
+
+        posthog.capture("description_checker_gated", {
+          tool_name: "description_checker",
+          runs_used: data.detail?.runs_used ?? 3,
+        });
+
         return;
       }
 
@@ -169,15 +183,37 @@ export function DescriptionCheckerClient() {
             : "Something went wrong. Please try again in a moment."
         );
         setStatus("error");
+
+        posthog.capture("description_checker_failed", {
+          tool_name: "description_checker",
+          failure_type: data.detail || `http_${res.status}`,
+          status_code: res.status,
+        });
+
         return;
       }
 
       const data: DiagnosticResult = await res.json();
       setResult(data);
       setStatus("success");
+
+      posthog.capture("description_checker_completed", {
+        tool_name: "description_checker",
+        char_count: data.char_count,
+        runs_used: data.runs_used,
+        email_on_file: data.email_on_file,
+        critical_count: Object.values(data.diagnostic).filter(c => c.state === "critical").length,
+        needs_work_count: Object.values(data.diagnostic).filter(c => c.state === "needs_work").length,
+        strong_count: Object.values(data.diagnostic).filter(c => c.state === "strong").length,
+      });
     } catch {
       setErrorMsg("Could not reach the server. Check your connection and try again.");
       setStatus("error");
+
+      posthog.capture("description_checker_failed", {
+        tool_name: "description_checker",
+        failure_type: "network_error",
+      });
     }
   };
 

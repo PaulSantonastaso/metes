@@ -201,6 +201,14 @@ export function ComplianceCheckClient() {
 
   const handleScan = async (overrideEmail?: string) => {
     if (!text.trim() || scanStatus === "loading") return;
+
+    posthog.capture("compliance_check_submitted", {
+      tool_name: "compliance_check",
+      char_count: text.trim().length,
+      has_email: !!(overrideEmail || email),
+      has_turnstile_token: !!turnstileToken,
+    });
+
     setScanStatus("loading");
     setResult(null);
     setErrorMsg(null);
@@ -223,6 +231,12 @@ export function ComplianceCheckClient() {
         const data = await res.json();
         setRunsUsed(data.detail?.runs_used ?? 3);
         setScanStatus("email_gate");
+
+        posthog.capture("compliance_check_gated", {
+          tool_name: "compliance_check",
+          runs_used: data.detail?.runs_used ?? 3,
+        });
+
         return;
       }
 
@@ -234,17 +248,35 @@ export function ComplianceCheckClient() {
             : "Something went wrong. Please try again."
         );
         setScanStatus("error");
+
+        posthog.capture("compliance_check_failed", {
+          tool_name: "compliance_check",
+          failure_type: data.detail || `http_${res.status}`,
+          status_code: res.status,
+        });
+
         return;
       }
 
       const data: ComplianceResult = await res.json();
       setResult(data);
       setScanStatus(data.status === "pass" ? "passed" : "flagged");
+
+      posthog.capture("compliance_check_completed", {
+        tool_name: "compliance_check",
+        result_status: data.status,
+        issues_count: data.issues_found?.length ?? 0,
+      });
     } catch {
       setErrorMsg(
         "Could not reach the server. Check your connection and try again."
       );
       setScanStatus("error");
+
+      posthog.capture("compliance_check_failed", {
+        tool_name: "compliance_check",
+        failure_type: "network_error",
+      });
     }
   };
 

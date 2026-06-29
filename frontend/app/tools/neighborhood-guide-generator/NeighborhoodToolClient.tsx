@@ -146,6 +146,14 @@ export function NeighborhoodToolClient() {
 
   const handleGenerate = async (overrideEmail?: string) => {
     if (!address.trim() || status === "loading") return;
+
+    posthog.capture("neighborhood_guide_submitted", {
+      tool_name: "neighborhood_guide",
+      address_length: address.trim().length,
+      has_email: !!(overrideEmail || email),
+      has_turnstile_token: !!turnstileToken,
+    });
+
     setStatus("loading");
     setResult(null);
     setErrorMsg(null);
@@ -166,6 +174,12 @@ export function NeighborhoodToolClient() {
         const data = await res.json();
         setRunsUsed(data.detail?.runs_used ?? 3);
         setStatus("email_gate");
+
+        posthog.capture("neighborhood_guide_gated", {
+          tool_name: "neighborhood_guide",
+          runs_used: data.detail?.runs_used ?? 3,
+        });
+
         return;
       }
 
@@ -177,15 +191,32 @@ export function NeighborhoodToolClient() {
             : "Something went wrong. Please try again in a moment."
         );
         setStatus("error");
+
+        posthog.capture("neighborhood_guide_failed", {
+          tool_name: "neighborhood_guide",
+          failure_type: data.detail || `http_${res.status}`,
+          status_code: res.status,
+        });
+
         return;
       }
 
       const data: NeighborhoodResult = await res.json();
       setResult(data);
       setStatus("success");
+
+      posthog.capture("neighborhood_guide_completed", {
+        tool_name: "neighborhood_guide",
+        has_lifestyle_paragraph: !!data.neighborhood_guide,
+      });
     } catch {
       setErrorMsg("Could not reach the server. Check your connection and try again.");
       setStatus("error");
+
+      posthog.capture("neighborhood_guide_failed", {
+        tool_name: "neighborhood_guide",
+        failure_type: "network_error",
+      });
     }
   };
 
