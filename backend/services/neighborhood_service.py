@@ -74,6 +74,9 @@ class NearbyPlace:
     vicinity: str
     rating: float | None
     review_count: int | None
+    primary_type: str | None = None
+    primary_type_display: str | None = None
+    all_types: list[str] | None = None
 
 
 @dataclass
@@ -93,9 +96,26 @@ class NeighborhoodContext:
 
         lines = [f"Nearby places within 2.5 miles of {self.address}:"]
         for place in self.places:
+            # Prefer Google's display name for the category over our query bucket
+            type_label = place.primary_type_display or place.place_type
+            type_str = f"[{type_label}]"
+
             rating_str = f", rated {place.rating}" if place.rating else ""
             reviews_str = f", {place.review_count} reviews" if place.review_count else ""
-            lines.append(f"  - {place.name} [{place.place_type}]{rating_str}{reviews_str}")
+
+            # Surface additional type tags when they add meaningful signal
+            extra_types = []
+            if place.all_types:
+                # Skip the primary type (already shown) and infrastructure tags that add no value
+                noise_tags = {"point_of_interest", "establishment", "store", "food"}
+                extra_types = [
+                    t for t in place.all_types
+                    if t != place.primary_type and t not in noise_tags
+                ][:3]  # Cap at 3 to keep the prompt compact
+
+            tags_str = f", tags: {', '.join(extra_types)}" if extra_types else ""
+
+            lines.append(f"  - {place.name} {type_str}{rating_str}{reviews_str}{tags_str}")
 
         return "\n".join(lines)
 
@@ -159,7 +179,7 @@ async def _fetch_places_for_type(
             headers={
                 "Content-Type": "application/json",
                 "X-Goog-Api-Key": api_key,
-                "X-Goog-FieldMask": "places.displayName,places.types,places.formattedAddress,places.rating,places.userRatingCount",
+                "X-Goog-FieldMask": "places.displayName,places.types,places.primaryType,places.primaryTypeDisplayName,places.formattedAddress,places.rating,places.userRatingCount",
             },
             json={
                 "includedTypes": [place_type],
@@ -189,6 +209,9 @@ async def _fetch_places_for_type(
                 vicinity=result.get("formattedAddress", ""),
                 rating=result.get("rating"),
                 review_count=result.get("userRatingCount"),
+                primary_type=result.get("primaryType"),
+                primary_type_display=result.get("primaryTypeDisplayName", {}).get("text") if isinstance(result.get("primaryTypeDisplayName"), dict) else None,
+                all_types=result.get("types"),
             ))
 
         return places
