@@ -90,8 +90,10 @@ NEIGHBORHOOD_PROMPT = """You are a real estate copywriter who knows what makes a
 PROPERTY ADDRESS:
 {address}
 
-NEARBY PLACES (from live Google Places data — name, category, rating, review count):
+NEARBY PLACES (from live Google Places data — name, category from Google's own classification, rating, review count, additional type tags):
 {places_formatted}
+
+The category in brackets is Google's classification of what the place actually is. Use this for accurate descriptions — e.g., "Italian Restaurant" is more specific than just "restaurant" and should inform the description language. Additional tags after "tags:" indicate sub-categories (e.g., "bakery, cafe" means it's both). Use the tags to write more precise descriptions.
 
 Use the rating and review count to calibrate confidence:
   - 4.5+ rating with 500+ reviews → established local standard, can describe with confidence
