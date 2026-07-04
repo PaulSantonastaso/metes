@@ -76,7 +76,7 @@ If you're evaluating this for engineering or product roles and want to discuss t
 
 ---
 
-### AI usage
+## AI usage
 
 This project is built with heavy, intentional use of Claude. I'm not hiding that — it's how modern AI-native product work gets done, and being explicit about the workflow is more useful than pretending otherwise.
 
