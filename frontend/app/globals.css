@@ -31,6 +31,9 @@
     --accent:             240 4.8% 95.9%;
     --accent-foreground:  240 5.9% 10%;
 
+    --destructive:        0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
     --radius: 0.5rem; /* 8px — cards */
 
     /* ── Metes brand tokens ── */
@@ -41,6 +44,39 @@
     --metes-gold-deep:  #9A7E50;
     --metes-ink-soft:   #4A6B53;
     --metes-border:     rgba(20,39,30,0.10);
+  }
+
+  /* ── Metes flow theme ──
+     Scoped warm remap of the shadcn tokens, applied on the root div
+     of /review and /preview. Components consuming semantic tokens
+     (cards, borders, shimmer, muted text) re-skin automatically. */
+  .metes-flow {
+    --background:         40 32% 91%;   /* cream #EFEAE0 */
+    --foreground:         152 33% 12%;  /* forest-deep #14271E */
+
+    --card:               43 49% 96%;   /* card #FAF7F0 */
+    --card-foreground:    152 33% 12%;
+
+    --muted:              43 22% 88%;   /* warm parchment */
+    --muted-foreground:   136 18% 36%;  /* moss #4A6B53 */
+
+    --border:             44 15% 83%;   /* ink @10% blended on cream */
+    --input:              44 15% 83%;
+    --ring:               37 36% 56%;   /* gold #B89968 */
+
+    --primary:            150 32% 18%;  /* forest #1F3D2E */
+    --primary-foreground: 40 35% 93%;   /* cream-warm #F4F0E8 */
+
+    --secondary:          43 22% 88%;
+    --secondary-foreground: 152 33% 12%;
+
+    --accent:             43 22% 88%;
+    --accent-foreground:  152 33% 12%;
+
+    --destructive:        0 60% 42%;    /* muted brick — sits better on cream */
+    --destructive-foreground: 40 35% 93%;
+
+    --radius: 0.75rem;                  /* 12px cards, matches homepage */
   }
 
   /* ── Typography base ── */
@@ -91,7 +127,7 @@
 
   /* Section label — consistent uppercase track across all pages */
   .section-label {
-    @apply text-2xs font-semibold uppercase tracking-widest text-muted-foreground;
+    @apply font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground;
   }
 
   /* Scrollbar — thin, zinc-tinted */

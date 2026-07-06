@@ -82,12 +82,13 @@ export function PurchaseCard({
       />
 
       {/* Optional add-on label */}
-      <p className="mb-1.5 mt-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+      <p className="mb-1.5 mt-3 font-mono text-[10px] uppercase tracking-[0.1em] text-metes-gold-deep">
         Optional add-on
       </p>
 
       {/* Option: Listing + Photos */}
       <OptionCard
+        accent
         selected={selected === "both"}
         onSelect={() => {
           setSelected("both");
@@ -171,25 +172,32 @@ interface OptionCardProps {
   price: string;
   description: string;
   features: string[];
-}
-
-function OptionCard({
+  /** Upsell treatment — gold dashed border when unselected */
+  accent?: boolean;
+}function OptionCard({
   selected,
   onSelect,
   title,
   price,
   description,
   features,
+  accent = false,
 }: OptionCardProps) {
   return (
     <button
       onClick={onSelect}
-      style={selected ? { borderColor: "var(--metes-forest)" } : {}}
+      style={{
+        borderColor: selected
+          ? "var(--metes-forest)"
+          : accent
+          ? "var(--metes-gold)"
+          : undefined,
+        borderStyle: !selected && accent ? "dashed" : "solid",
+        background: selected ? "rgba(31,61,46,0.05)" : undefined,
+      }}
       className={cn(
         "w-full rounded-lg border p-3 text-left transition-colors",
-        selected
-          ? "bg-muted/50"
-          : "border-border bg-transparent hover:border-foreground/30"
+        !selected && !accent && "border-border hover:border-foreground/30"
       )}
     >
       <div className="mb-1 flex items-start justify-between gap-2">

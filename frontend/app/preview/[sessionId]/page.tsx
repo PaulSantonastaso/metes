@@ -22,6 +22,7 @@ import { useGenerationPolling } from "@/hooks/useGenerationPolling";
 import { createCheckout, getDownloadUrl, ApiError } from "@/lib/api";
 import type { PurchaseOption, Session } from "@/types";
 import { Download } from "lucide-react";
+import Link from "next/link";
 import posthog from "posthog-js";
 
 // ─────────────────────────────────────────────────────────────────
@@ -135,11 +136,8 @@ function PreviewPageContent({
   // ── Render ────────────────────────────────────────────────────
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <Navbar
-        backHref={`/review/${sessionId}`}
-        backLabel="Back to review"
-      />
+    <div className="metes-flow flex min-h-screen flex-col bg-background">
+      <Navbar currentStep="preview" />
 
       {/* Success banner — post-purchase */}
       {isPurchased && session?.agentEmail && (
@@ -211,8 +209,21 @@ function PreviewPageContent({
                 <PropertyDetailsCard
                   property={property!}
                   mode="readonly"
-                  className="mb-4"
+                  className="mb-1.5"
                 />
+                {!isPurchased && (
+                  <p className="mb-4 px-1 text-[11px] text-muted-foreground">
+                    Spot an error?{" "}
+                    <Link
+                      href={`/review/${sessionId}`}
+                      className="underline underline-offset-2 transition-colors hover:text-foreground"
+                      style={{ textDecorationColor: "var(--metes-gold)" }}
+                    >
+                      Edit details and regenerate
+                    </Link>
+                    {" "}— free before you buy.
+                  </p>
+                )}
                 <SocialLaunchPack
                   content={content}
                   sessionId={sessionId}
@@ -224,7 +235,7 @@ function PreviewPageContent({
               </>
             ) : (
               <>
-                <SkeletonSection title="MLS Description" lineCount={5} generatingLabel="Writing…" />
+                <SkeletonSection title="MLS Description" tone="moss" lineCount={5} generatingLabel="Writing…" />
                 {property ? (
                   <PropertyDetailsCard
                     property={property}
@@ -234,9 +245,9 @@ function PreviewPageContent({
                 ) : (
                   <SkeletonSection title="Property Details" lineCount={4} />
                 )}
-                <SkeletonSection title="Social Launch Pack" lineCount={3} generatingLabel="Creating…" />
-                <SkeletonSection title="Email Campaign" lineCount={4} generatingLabel="Drafting…" />
-                <SkeletonSection title="Fair Housing Compliance" lineCount={2} generatingLabel="Reviewing…" />
+                <SkeletonSection title="Social Launch Pack" tone="gold" lineCount={3} generatingLabel="Creating…" />
+                <SkeletonSection title="Email Campaign" tone="forest" lineCount={4} generatingLabel="Drafting…" />
+                <SkeletonSection title="Fair Housing Compliance" tone="forest" lineCount={2} generatingLabel="Reviewing…" />
               </>
             )}
 

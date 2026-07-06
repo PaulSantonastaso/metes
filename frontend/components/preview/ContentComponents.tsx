@@ -31,7 +31,7 @@ function CopyButton({ text, className, contentType }: { text: string; className?
       )}
     >
       {copied ? (
-        <><Check className="h-3 w-3 text-green-600" />Copied</>
+        <><Check className="h-3 w-3 text-metes-sage" />Copied</>
       ) : (
         <><Copy className="h-3 w-3" />Copy</>
       )}
@@ -52,9 +52,10 @@ export function MlsDescription({ content, isPurchased }: MlsDescriptionProps) {
   return (
     <ContentSection
       title="MLS Description"
+      tone="moss"
       badge={
         isPurchased ? (
-          <span className="text-[10px] font-medium text-green-700">✓ Copy enabled</span>
+          <span className="text-[10px] font-medium text-metes-sage">✓ Copy enabled</span>
         ) : (
           <span className="text-[10px] text-muted-foreground">Purchase to copy</span>
         )
@@ -64,7 +65,7 @@ export function MlsDescription({ content, isPurchased }: MlsDescriptionProps) {
         <p className="text-xs leading-relaxed text-foreground">
           {content.mlsDescription}
         </p>
-        <p className="mt-2 text-[10px] text-green-700">
+        <p className="mt-2 text-[10px] text-metes-sage">
           ✓ {content.mlsCharCount} / 950 characters
         </p>
         {isPurchased && (
@@ -105,9 +106,10 @@ export function SocialLaunchPack({
   return (
     <ContentSection
       title="Social Launch Pack"
+      tone="gold"
       badge={
         isPurchased ? (
-          <span className="text-[10px] font-medium text-green-700">✓ Copy enabled</span>
+          <span className="text-[10px] font-medium text-metes-sage">✓ Copy enabled</span>
         ) : null
       }
     >
@@ -184,9 +186,10 @@ export function EmailCampaign({ content, isPurchased }: EmailCampaignProps) {
   return (
     <ContentSection
       title="Email Campaign"
+      tone="forest"
       badge={
         isPurchased ? (
-          <span className="text-[10px] font-medium text-green-700">✓ Copy enabled</span>
+          <span className="text-[10px] font-medium text-metes-sage">✓ Copy enabled</span>
         ) : null
       }
     >
@@ -248,21 +251,16 @@ export function CompliancePanel({ content, isPurchased }: CompliancePanelProps) 
   return (
     <ContentSection
       title="Fair Housing Compliance"
+      tone="forest"
       badge={
         isPurchased ? (
-          <span className="text-[10px] font-medium text-green-700">✓ Full audit unlocked</span>
+          <span className="text-[10px] font-medium text-metes-sage">✓ Full audit unlocked</span>
         ) : null
       }
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-green-600" />
-          <span className="text-xs font-medium text-foreground">
-            {compliance.totalAssets} assets reviewed
-          </span>
-        </div>
-        <div className="flex items-center gap-4">
-          <StatCell
+          <span className="h-2 w-2 rounded-full bg-metes-sage" /><StatCell
             num={compliance.passed}
             label="Passed"
             color="text-green-700"
@@ -276,6 +274,26 @@ export function CompliancePanel({ content, isPurchased }: CompliancePanelProps) 
             num={compliance.flagged}
             label="Flagged"
             color={compliance.flagged > 0 ? "text-red-600" : "text-green-700"}
+          />
+          <span className="text-xs font-medium text-foreground">
+            {compliance.totalAssets} assets reviewed
+          </span>
+        </div>
+        <div className="flex items-center gap-4">
+          <StatCell
+            num={compliance.passed}
+            label="Passed"
+            color="text-metes-sage"
+          />
+          <StatCell
+            num={compliance.revised}
+            label="Revised"
+            color="text-metes-gold-deep"
+          />
+          <StatCell
+            num={compliance.flagged}
+            label="Flagged"
+            color={compliance.flagged > 0 ? "text-destructive" : "text-metes-sage"}
           />
         </div>
       </div>
@@ -311,26 +329,39 @@ interface SuccessBannerProps {
 
 export function SuccessBanner({ agentEmail, onDownload }: SuccessBannerProps) {
   return (
-    <div className="flex items-center justify-between border-b border-border bg-muted/30 px-6 py-3.5">
-      <div className="flex items-center gap-3">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-foreground">
-          <Check className="h-3.5 w-3.5 text-background" />
+    <div
+      className="border-b"
+      style={{
+        background: "rgba(92,138,110,0.10)",
+        borderColor: "rgba(92,138,110,0.25)",
+      }}
+    >
+      <div className="mx-auto flex w-full max-w-[1280px] items-center justify-between gap-4 px-6 py-3 lg:px-12">
+        <div className="flex items-center gap-3">
+          <div
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full"
+            style={{ background: "#5C8A6E" }}
+          >
+            <Check className="h-3.5 w-3.5" style={{ color: "var(--metes-cream)" }} />
+          </div>
+          <div className="min-w-0">
+            <p className="font-mono text-[10px] uppercase tracking-[0.12em] text-metes-moss">
+              Payment confirmed
+            </p>
+            <p className="truncate text-2xs text-foreground">
+              Your package is ready — sent to{" "}
+              <span className="font-medium">{agentEmail}</span> · link valid 7 days
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-xs font-semibold text-foreground">
-            Payment confirmed — your package is ready
-          </p>
-          <p className="text-[11px] text-muted-foreground">
-            Sent to {agentEmail} · Download link valid for 7 days
-          </p>
-        </div>
+        <button
+          onClick={onDownload}
+          style={{ background: "var(--metes-forest)", color: "var(--metes-cream)" }}
+          className="hidden shrink-0 items-center gap-2 rounded-md px-4 py-2 text-xs font-semibold transition-opacity hover:opacity-90 lg:flex"
+        >
+          Download Package
+        </button>
       </div>
-      <button
-        onClick={onDownload}
-        className="flex shrink-0 items-center gap-2 rounded-md bg-foreground px-4 py-2 text-xs font-semibold text-background hover:opacity-90 transition-opacity"
-      >
-        Download Package
-      </button>
     </div>
   );
 }

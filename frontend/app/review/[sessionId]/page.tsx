@@ -42,8 +42,9 @@ function AiIntelligencePanel({
 
   return (
     <div style={{
-      borderRadius: "10px",
+      borderRadius: "12px",
       border: "1px solid hsl(var(--border))",
+      background: "hsl(var(--card))",
       overflow: "hidden",
     }}>
       {/* Header */}
@@ -59,11 +60,12 @@ function AiIntelligencePanel({
           display: "flex", alignItems: "center", justifyContent: "center",
           flexShrink: 0,
         }}>
-          <Star style={{ width: "9px", height: "9px", fill: "var(--metes-cream)", color: "var(--metes-cream)" }} />
+          <Star style={{ width: "9px", height: "9px", fill: "var(--metes-gold)", color: "var(--metes-gold)" }} />
         </div>
         <span style={{
-          fontSize: "10px", fontWeight: 600, letterSpacing: "0.1em",
-          textTransform: "uppercase", color: "var(--metes-ink-soft)",
+          fontFamily: "var(--font-jetbrains, monospace)",
+          fontSize: "10px", fontWeight: 500, letterSpacing: "0.1em",
+          textTransform: "uppercase", color: "var(--metes-gold-deep)",
         }}>
           AI selected your shots
         </span>
@@ -87,10 +89,10 @@ function AiIntelligencePanel({
               position: "absolute", top: "-6px", right: "-6px",
               width: "16px", height: "16px", borderRadius: "50%",
               background: "var(--metes-forest)",
-              border: "2px solid white",
+              border: "2px solid var(--metes-cream)",
               display: "flex", alignItems: "center", justifyContent: "center",
             }}>
-              <Star style={{ width: "8px", height: "8px", fill: "var(--metes-cream)", color: "var(--metes-cream)" }} />
+              <Star style={{ width: "8px", height: "8px", fill: "var(--metes-gold)", color: "var(--metes-gold)" }} />
             </div>
           </div>
           <div>
@@ -119,7 +121,7 @@ function AiIntelligencePanel({
                   <img
                     src={getImageUrl(sessionId, img.id)}
                     alt={img.roomType}
-                    style={{ width: "52px", height: "40px", objectFit: "cover", borderRadius: "5px", border: "1.5px solid var(--metes-forest)" }}
+                    style={{ width: "52px", height: "40px", objectFit: "cover", borderRadius: "5px", border: "1.5px solid var(--metes-gold)" }}
                   />
                   <div style={{
                     position: "absolute", bottom: "2px", left: 0, right: 0,
@@ -142,6 +144,51 @@ function AiIntelligencePanel({
             </p>
           </div>
         )}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Mobile AI strip — condensed intelligence proof (below md only)
+// ─────────────────────────────────────────────────────────────────
+
+function MobileAiStrip({
+  sessionId,
+  images,
+}: {
+  sessionId: string;
+  images: ListingImage[];
+}) {
+  const heroImage = images.find((img) => img.rank === 1);
+  const socialCount = images.filter((img) => img.selectedForSocial).length;
+
+  if (!heroImage) return null;
+
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-border bg-card p-3 md:hidden">
+      <div className="relative shrink-0">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={getImageUrl(sessionId, heroImage.id)}
+          alt="Hero"
+          className="h-[44px] w-[56px] rounded-md object-cover"
+        />
+        <div
+          className="absolute -right-1.5 -top-1.5 flex h-4 w-4 items-center justify-center rounded-full"
+          style={{ background: "var(--metes-forest)", border: "2px solid var(--metes-cream)" }}
+        >
+          <Star style={{ width: "8px", height: "8px", fill: "var(--metes-gold)", color: "var(--metes-gold)" }} />
+        </div>
+      </div>
+      <div className="min-w-0">
+        <p className="font-mono text-[10px] uppercase tracking-[0.1em]" style={{ color: "var(--metes-gold-deep)" }}>
+          AI selected your shots
+        </p>
+        <p className="mt-0.5 truncate text-2xs text-foreground">
+          Hero: {heroImage.roomType.replace(/_/g, " ")}
+          {socialCount > 0 && ` · ${socialCount} social picks`}
+        </p>
       </div>
     </div>
   );
@@ -236,8 +283,8 @@ function ReviewPageContent({ sessionId }: { sessionId: string }) {
   // ── Loading ──
   if (isLoadingSession) {
     return (
-      <div className="flex min-h-screen flex-col">
-        <Navbar backHref="/" backLabel="Start over" />
+      <div className="metes-flow flex min-h-screen flex-col bg-background">
+        <Navbar currentStep="review" />
         <div className="flex flex-1 items-center justify-center">
           <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
         </div>
@@ -248,8 +295,8 @@ function ReviewPageContent({ sessionId }: { sessionId: string }) {
   // ── Error ──
   if (loadError || !session || !property) {
     return (
-      <div className="flex min-h-screen flex-col">
-        <Navbar backHref="/" backLabel="Start over" />
+      <div className="metes-flow flex min-h-screen flex-col bg-background">
+        <Navbar currentStep="review" />
         <div className="flex flex-1 items-center justify-center px-6">
           <div className="max-w-sm text-center">
             <p className="mb-2 text-sm font-medium text-foreground">Something went wrong</p>
@@ -297,16 +344,23 @@ function ReviewPageContent({ sessionId }: { sessionId: string }) {
 
   // ── Page ──
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <Navbar backHref="/" backLabel="Start over" />
+    <div className="metes-flow flex min-h-screen flex-col bg-background">
+      <Navbar currentStep="review" />
 
       {/* Page header */}
-      <div className="border-b border-border py-6">
-        <div className="mx-auto max-w-[1280px] px-6 lg:px-12">
-          <h1 className="mb-1 text-base font-semibold text-foreground">
+      <div className="border-b border-border py-7">
+        <div className="mx-auto w-full max-w-[1280px] px-6 lg:px-12">
+          <div className="mb-3 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-metes-gold-deep">
+            <span className="inline-block h-px w-[18px] bg-metes-gold-deep" />
+            Step 02 — Review
+          </div>
+          <h1
+            className="mb-1.5 font-manrope text-foreground"
+            style={{ fontWeight: 500, fontSize: "clamp(22px, 3vw, 30px)", lineHeight: 1.1, letterSpacing: "-0.015em" }}
+          >
             Here&apos;s what we found.
           </h1>
-          <p className="text-xs text-muted-foreground">
+          <p className="max-w-[480px] text-xs leading-relaxed text-muted-foreground">
             Tap any field to correct it. Everything here feeds your campaign — get it right before we write.
           </p>
         </div>
@@ -324,6 +378,8 @@ function ReviewPageContent({ sessionId }: { sessionId: string }) {
                 mode="edit"
                 onChange={setProperty}
               />
+
+              <MobileAiStrip sessionId={sessionId} images={session.images} />
 
               {features.length > 0 && (
                 <DetectedFeaturesGrid
@@ -375,6 +431,7 @@ function ReviewPageContent({ sessionId }: { sessionId: string }) {
       <MobileStickyBar
         variant="generate"
         isLoading={isGenerating}
+        error={generateError}
         onGenerate={handleGenerate}
       />
 

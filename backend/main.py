@@ -600,6 +600,27 @@ async def generate(session_id: str, request: Request):
             details.bedrooms = int(edits["beds"] or 0)
         if edits.get("baths") is not None:
             details.bathrooms = float(edits["baths"] or 0)
+
+        # HITL facts-grid edits — values may arrive as formatted display
+        # strings ("5,227 sqft", "2 car"), so parse ints defensively.
+        def _edit_int(v):
+            if v is None:
+                return None
+            if isinstance(v, (int, float)):
+                return int(v)
+            digits = "".join(ch for ch in str(v) if ch.isdigit())
+            return int(digits) if digits else None
+
+        if edits.get("sqft") is not None:
+            details.square_footage = _edit_int(edits["sqft"])
+        if edits.get("yearBuilt") is not None:
+            details.year_built = _edit_int(edits["yearBuilt"])
+        if edits.get("lotSize") is not None:
+            details.lot_size_sqft = _edit_int(edits["lotSize"])
+        if edits.get("garage") is not None:
+            details.garage_spaces = _edit_int(edits["garage"])
+        if edits.get("propertyType") is not None:
+            details.property_type = str(edits["propertyType"]).strip() or None
         if edits.get("communityName") is not None:
             details.community_name = edits["communityName"] or None
         if edits.get("subdivisionName") is not None:
