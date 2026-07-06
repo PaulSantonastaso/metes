@@ -24,7 +24,6 @@ const FACT_KEYS: Array<{
   { label: "Lot Size",       key: "lotSize",      format: (v) => v != null ? `${Number(v).toLocaleString()} sqft` : "—" },
   { label: "Garage",         key: "garage",       format: (v) => v != null ? `${v} car` : "—" },
   { label: "Property Type",  key: "propertyType" },
-  { label: "MLS #",          key: "mlsNumber" },
 ];
 
 export function PropertyDetailsCard({
@@ -71,7 +70,7 @@ export function PropertyDetailsCard({
   }, [newFeatureText, property, onChange]);
 
   return (
-    <div className={cn("rounded-lg border border-border overflow-hidden", className)}>
+    <div className={cn("rounded-lg border border-border bg-card overflow-hidden", className)}>
       {/* Card header */}
       <div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-3">
         <span className="section-label">Property Details</span>

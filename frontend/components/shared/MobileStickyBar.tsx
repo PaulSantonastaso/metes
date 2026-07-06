@@ -29,6 +29,7 @@ interface DownloadVariantProps extends MobileStickyBarBaseProps {
 interface GenerateVariantProps extends MobileStickyBarBaseProps {
   variant: "generate";
   isLoading?: boolean;
+  error?: string | null;
   onGenerate: () => void;
 }
 
@@ -103,7 +104,8 @@ function CheckoutBar({
             onClick={() => setSheetOpen(false)}
           />
           {/* Sheet */}
-          <div className="relative z-10 rounded-t-2xl bg-background px-4 pb-8 pt-4 shadow-xl">
+          <div className="relative z-10 rounded-t-2xl bg-background px-4 pb-8 pt-3 shadow-xl">
+            <div className="mx-auto mb-3 h-1 w-9 rounded-full bg-border" />
             <div className="mb-4 flex items-center justify-between">
               <p className="text-sm font-semibold text-foreground">Choose your package</p>
               <button
@@ -138,7 +140,8 @@ function DownloadBar({ onDownload }: DownloadVariantProps) {
       </p>
       <button
         onClick={onDownload}
-        className="flex shrink-0 items-center gap-2 rounded-md bg-foreground px-5 py-2.5 text-xs font-semibold text-background hover:opacity-90 transition-opacity"
+        style={{ background: "var(--metes-forest)", color: "var(--metes-cream)" }}
+        className="flex shrink-0 items-center gap-2 rounded-md px-5 py-2.5 text-xs font-semibold hover:opacity-90 transition-opacity"
       >
         <Download className="h-3.5 w-3.5" />
         Download
@@ -149,13 +152,18 @@ function DownloadBar({ onDownload }: DownloadVariantProps) {
 
 // ── Generate bar (review page) ────────────────────────────────────
 
-function GenerateBar({ isLoading = false, onGenerate }: GenerateVariantProps) {
+function GenerateBar({ isLoading = false, error, onGenerate }: GenerateVariantProps) {
   return (
+    <>
+      {error && (
+        <p className="mb-2 text-center text-[11px] text-destructive">{error}</p>
+      )}
     <button
       onClick={onGenerate}
       disabled={isLoading}
+      style={{ background: "var(--metes-forest)", color: "var(--metes-cream)" }}
       className={cn(
-        "flex w-full items-center justify-center gap-2 rounded-md bg-foreground py-3 text-xs font-semibold text-background transition-opacity",
+        "flex w-full items-center justify-center gap-2 rounded-md py-3 text-xs font-semibold transition-opacity",
         isLoading ? "cursor-not-allowed opacity-60" : "hover:opacity-90"
       )}
     >
@@ -168,5 +176,6 @@ function GenerateBar({ isLoading = false, onGenerate }: GenerateVariantProps) {
         "Generate My Campaign →"
       )}
     </button>
+    </>
   );
 }

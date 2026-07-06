@@ -1,82 +1,51 @@
 import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
 import { StepIndicator } from "./StepIndicator";
 import { cn } from "@/lib/utils";
 import type { Step } from "@/types";
 
 interface NavbarProps {
-  /** Which step to highlight. Omit on homepage (no step indicator shown). */
+  /** Which step to highlight in the flow indicator. */
   currentStep?: Step;
-  /** Show step labels below pips */
+  /** Show step labels below pips. Defaults on — it's the only orientation in the flow. */
   showStepLabels?: boolean;
-  /** Back link — shown on review + preview pages */
-  backHref?: string;
-  backLabel?: string;
   className?: string;
 }
 
 export function Navbar({
   currentStep,
-  showStepLabels = false,
-  backHref,
-  backLabel = "Back",
+  showStepLabels = true,
   className,
 }: NavbarProps) {
   return (
     <header
       className={cn(
-        "w-full border-b border-border bg-background",
+        "sticky top-0 z-50 w-full border-b border-border bg-background",
         className
       )}
     >
-      <div className="mx-auto flex h-[52px] w-full max-w-[1280px] items-center justify-between px-6 lg:px-12">
-      {/* Logo */}
-      <Link
-        href="/"
-        className="text-sm font-semibold tracking-tight text-foreground hover:opacity-80 transition-opacity"
-      >
-        metes
-      </Link>
+      <div className="mx-auto flex h-[60px] w-full max-w-[1280px] items-center justify-between px-6 lg:px-12">
+        {/* Logo — mark + wordmark, mirrors the marketing Header */}
+        <Link
+          href="/"
+          aria-label="metes home"
+          className="flex items-center gap-2 font-manrope text-[17px] font-bold text-[#1F3D2E] no-underline transition-opacity hover:opacity-90"
+        >
+          <span
+            className="relative inline-block h-6 w-6 shrink-0 rounded-[6px] bg-[#1F3D2E]"
+            aria-hidden="true"
+          >
+            <span className="absolute inset-[6px] rounded-[2px] border-[1.5px] border-[#B89968]" />
+          </span>
+          metes
+        </Link>
 
-      {/* Center — step indicator (review + preview pages only) */}
-      {currentStep ? (
-        <StepIndicator
-          currentStep={currentStep}
-          showLabels={showStepLabels}
-        />
-      ) : (
-        // Homepage — nav links
-        <nav className="hidden sm:flex items-center gap-6">
-          <a
-            href="#how-it-works"
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            How it works
-          </a>
-          <a
-            href="#pricing"
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            Pricing
-          </a>
-        </nav>
-      )}
-
-      {/* Right — back link or spacer */}
-      <div className="w-[100px] flex justify-end">
-        {backHref ? (
-          <Link
-            href={backHref}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ChevronLeft className="h-3 w-3" />
-            {backLabel}
-          </Link>
-        ) : (
-          // Spacer to keep logo centered on homepage
-          <div />
+        {/* Center — flow steps */}
+        {currentStep && (
+          <StepIndicator currentStep={currentStep} showLabels={showStepLabels} />
         )}
-      </div>
+
+        {/* Right — spacer balancing the logo so the steps stay centered */}
+        <div className="w-[76px]" aria-hidden="true" />
       </div>
     </header>
   );

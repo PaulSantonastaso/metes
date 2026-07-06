@@ -53,6 +53,10 @@ const config: Config = {
           DEFAULT:    "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        destructive: {
+          DEFAULT:    "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
         card: {
           DEFAULT:    "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
@@ -65,6 +69,7 @@ const config: Config = {
           "forest-deep": "#14271E",
           "forest-dim":  "#2C4D3D",
           moss:     "#4A6B53",
+          sage:     "#5C8A6E",
           gold:     "#B89968",
           "gold-deep": "#9A7E50",
           "gold-soft": "#D9C49C",

@@ -28,7 +28,7 @@ export function DetectedFeaturesGrid({
   if (categories.length === 0) return null;
 
   return (
-    <div className={cn("overflow-hidden rounded-lg border border-border", className)}>
+    <div className={cn("overflow-hidden rounded-lg border border-border bg-card", className)}>
       {/* Header */}
       <div className="flex items-center justify-between border-b border-border bg-muted/50 px-4 py-3">
         <span className="section-label">Image-Detected Features</span>
@@ -39,14 +39,14 @@ export function DetectedFeaturesGrid({
 
       {/* Grid — up to 4 columns, one per category */}
       <div
-        className="grid divide-x divide-muted"
-        style={{ gridTemplateColumns: `repeat(${Math.min(categories.length, 4)}, 1fr)` }}
+        className="grid gap-px bg-muted"
+        style={{ gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))" }}
       >
         {categories.slice(0, 4).map((category) => {
           const categoryFeatures = features.filter((f) => f.category === category);
 
           return (
-            <div key={category} className="p-3.5">
+            <div key={category} className="bg-card p-3.5">
               <p className="mb-2.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 {category}
               </p>

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono, Onest } from "next/font/google";
+import { Inter, JetBrains_Mono, Manrope } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 
@@ -12,10 +12,10 @@ const inter = Inter({
   display: "swap",
 });
 
-const onest = Onest({
+const manrope = Manrope({
   subsets: ["latin"],
-  variable: "--font-onest",
-  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-manrope",
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -82,7 +82,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${onest.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${manrope.variable} ${jetbrainsMono.variable}`}>
       <body className="min-h-screen bg-background font-sans antialiased">
         {children}
         {META_PIXEL_ID && (

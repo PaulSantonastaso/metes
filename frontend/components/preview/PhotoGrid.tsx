@@ -56,7 +56,7 @@ export function PhotoGrid({
             alt="Listing photo"
             className="h-full w-full object-cover"
           />
-          <div className="absolute bottom-2 left-2 rounded bg-background/80 px-2 py-0.5 text-[9px] font-semibold text-foreground backdrop-blur-sm">
+          <div className="absolute bottom-2 left-2 rounded bg-background/85 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em] text-foreground backdrop-blur-sm">
             {activeImageId === hero.id || !activeImageId ? "Hero — AI selected" : sorted.find(img => img.id === activeImageId)?.roomType?.replace(/_/g, " ")}
           </div>
         </div>
@@ -75,7 +75,7 @@ export function PhotoGrid({
             alt="Hero listing photo"
             className="h-full w-full object-cover transition-transform hover:scale-[1.02]"
           />
-          <div className="absolute bottom-2 left-2 rounded bg-background/80 px-2 py-0.5 text-[9px] font-semibold text-foreground backdrop-blur-sm">
+          <div className="absolute bottom-2 left-2 rounded bg-background/85 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.08em] text-foreground backdrop-blur-sm">
             Hero — AI selected
           </div>
         </div>
