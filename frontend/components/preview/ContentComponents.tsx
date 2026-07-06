@@ -260,21 +260,7 @@ export function CompliancePanel({ content, isPurchased }: CompliancePanelProps) 
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="h-2 w-2 rounded-full bg-metes-sage" /><StatCell
-            num={compliance.passed}
-            label="Passed"
-            color="text-green-700"
-          />
-          <StatCell
-            num={compliance.revised}
-            label="Revised"
-            color="text-amber-600"
-          />
-          <StatCell
-            num={compliance.flagged}
-            label="Flagged"
-            color={compliance.flagged > 0 ? "text-red-600" : "text-green-700"}
-          />
+          <span className="h-2 w-2 rounded-full bg-metes-sage" />
           <span className="text-xs font-medium text-foreground">
             {compliance.totalAssets} assets reviewed
           </span>
