@@ -101,8 +101,8 @@ export default function Footer() {
           </div>
           {([
             ["Product", ["How it works", "See an example", "Pricing"]],
-            ["Features", ["Compliance audit", "Neighborhood intelligence", "Photo curation"]],
-            ["Free tools", ["Fair Housing checker", "Neighborhood guide generator", "Listing description checker"]], 
+            ["Free tools", ["Fair Housing checker", "Neighborhood guide generator", "Listing description checker"]],
+            ["Learn", ["Fair Housing guide", "Fair Housing word list", "Neighborhood examples", "AI listing tells", "Writing for Zillow", "vs ChatGPT"]],
             ["Company", ["About", "Contact"]],
           ] as [string, string[]][]).map(([heading, links]) => (
             <div key={heading}>
@@ -122,14 +122,17 @@ export default function Footer() {
                   "How it works": "/#how-it-works",
                   "See an example": "/#",
                   "Pricing": "/#pricing",
-                  // Features
-                  "Compliance audit": "/compliance-audit",
-                  "Neighborhood intelligence": "/neighborhood-intelligence",
-                  "Photo curation": "/photo-curation",
                   // Free tools
                   "Fair Housing checker": "/tools/fha-compliance-checker",
                   "Neighborhood guide generator": "/tools/neighborhood-guide-generator",
                   "Listing description checker": "/tools/listing-description-checker",
+                  // Learn
+                  "Fair Housing guide": "/learn/fair-housing-language-mls-listings",
+                  "Fair Housing word list": "/learn/fair-housing-words-to-avoid",
+                  "Neighborhood examples": "/learn/neighborhood-description-examples",
+                  "AI listing tells": "/learn/ai-listing-description-tells",
+                  "Writing for Zillow": "/learn/writing-for-zillow-2026",
+                  "vs ChatGPT": "/compare/metes-vs-chatgpt",
                   // Company
                   "About": "/about",
                   "Contact": "/contact",

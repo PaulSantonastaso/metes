@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeaderNav } from "./HeaderNav";
 
 // ─────────────────────────────────────────────────────────────────
 // Types
@@ -20,7 +21,8 @@ interface HeaderProps {
 }
 
 // ─────────────────────────────────────────────────────────────────
-// Header — shared across homepage, tools, guides
+// Header — server component shell
+// Delegates all interactive nav to HeaderNav (client component)
 // ─────────────────────────────────────────────────────────────────
 
 export function Header({ variant = "light", sticky = true }: HeaderProps) {
@@ -49,11 +51,6 @@ export function Header({ variant = "light", sticky = true }: HeaderProps) {
   // Gold accent regardless of variant — it's the brand signature
   const logoInsetBorder = "border-[#B89968]";
 
-  // ── Nav link color ──
-  const linkColor = isDark
-    ? "text-[rgba(244,240,232,0.72)] hover:text-[#F4F0E8]"
-    : "text-[#4A6B53] hover:text-[#1F3D2E]";
-
   return (
     <header className={containerClasses}>
       <div className="mx-auto flex h-[60px] w-full max-w-[1280px] items-center justify-between px-6 lg:px-12">
@@ -75,24 +72,8 @@ export function Header({ variant = "light", sticky = true }: HeaderProps) {
           metes
         </Link>
 
-        {/* ── Nav links ── */}
-        <nav className="flex items-center gap-4 sm:gap-6">
-          <Link
-            href="/#how-it-works"
-            className={`text-[13px] font-medium no-underline transition-colors ${linkColor}`}
-          >
-            How it works
-          </Link>
-          <Link href="/neighborhood-intelligence" className={`text-[13px] font-medium no-underline transition-colors ${linkColor}`}>
-            Neighborhood
-          </Link>
-          <Link
-            href="/#pricing"
-            className={`text-[13px] font-medium no-underline transition-colors ${linkColor}`}
-          >
-            Pricing
-          </Link>
-        </nav>
+        {/* ── Interactive nav (client component) ── */}
+        <HeaderNav variant={variant} />
       </div>
     </header>
   );
