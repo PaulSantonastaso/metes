@@ -70,9 +70,11 @@ Files worth reading: `backend/services/compliance_service.py`, `backend/services
 
 ## On prompts
 
-The production prompt engineering — banned phrase lists, output schemas, calibration for low-density neighborhood markets, the six-category AI tell taxonomy that drives the Listing Description Checker — lives in a private submodule. The public repo shows the architecture that consumes prompts (chain construction, structured output, audit layers, cost-tier navigation) without the specific artifacts.
+The production prompts live at `backend/prompts/` and are intentionally public. The value of Metes as a system is in the architecture that consumes them — chain construction, structured output enforcement, compliance audit as a first-class layer, cost-tier navigation — not in the specific phrase lists.
 
-If you're evaluating this for engineering or product roles and want to discuss the prompt engineering approach in depth, I'm happy to walk through it directly.
+The prompts themselves are worth reading. `neighborhood_chain.py` is the best-documented example of constrained generation: banned phrases, low-density market handling, category calibration from Google Places signals. `mls_writer.txt` shows how output schemas are constructed through field descriptions rather than free prose. `social_media.txt` shows per-platform voice differentiation.
+
+Copying the prompts doesn't copy the product. The audit layer, the extraction pipeline, the image intelligence, the observability — that's the system.
 
 ---
 
