@@ -29,10 +29,10 @@ interface LearnItem {
 // Nav data
 // ─────────────────────────────────────────────────────────────────
 
-const PRODUCT_ITEMS: SimpleNavItem[] = [
-  { label: "How it works", href: "/#how-it-works" },
-  { label: "See an example", href: "/#example" },
-  { label: "Pricing", href: "/#pricing" },
+const FEATURES_ITEMS: SimpleNavItem[] = [
+  { label: "Compliance audit", href: "/compliance-audit" },
+  { label: "Neighborhood intelligence", href: "/neighborhood-intelligence" },
+  { label: "Photo curation", href: "/photo-curation" },
 ];
 
 const TOOLS_ITEMS: SimpleNavItem[] = [
@@ -134,19 +134,19 @@ export function HeaderNav({ variant = "light" }: HeaderNavProps) {
     <>
       {/* ─────────────── DESKTOP NAV ─────────────── */}
       <div ref={navRef} className="hidden md:flex items-center gap-6 relative">
-        {/* Product dropdown */}
+        {/* Features dropdown */}
         <div className="relative">
           <button
-            onClick={() => toggleMenu("product")}
+            onClick={() => toggleMenu("features")}
             className={triggerBaseClasses}
-            aria-expanded={openMenu === "product"}
+            aria-expanded={openMenu === "features"}
             aria-haspopup="true"
           >
-            Product
-            <ChevronDown className={`h-3 w-3 transition-transform ${openMenu === "product" ? "rotate-180" : ""}`} />
+            Features
+            <ChevronDown className={`h-3 w-3 transition-transform ${openMenu === "features" ? "rotate-180" : ""}`} />
           </button>
-          {openMenu === "product" && (
-            <SimpleDropdown items={PRODUCT_ITEMS} isDark={isDark} onNavigate={handleNavigate} />
+          {openMenu === "features" && (
+            <SimpleDropdown items={FEATURES_ITEMS} isDark={isDark} onNavigate={handleNavigate} />
           )}
         </div>
 
@@ -393,13 +393,13 @@ function MobileMenu({
 
       {/* Menu sections */}
       <div className="flex flex-col gap-8 px-6 py-8">
-        {/* Product */}
+        {/* Features */}
         <div>
           <div className={`mb-3 font-mono text-[11px] uppercase tracking-[0.14em] ${goldLabel}`}>
-            Product
+            Features
           </div>
           <div className="flex flex-col gap-1">
-            {PRODUCT_ITEMS.map((item) => (
+            {FEATURES_ITEMS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
