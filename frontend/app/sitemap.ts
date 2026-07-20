@@ -63,6 +63,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
     {
+      url: "https://www.metes.app/learn/solo-agent-listing-marketing-economics",
+      lastModified: new Date("2026-07-22"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
       url: "https://www.metes.app/compare/metes-vs-chatgpt",
       lastModified: new Date("2026-06-17"),
       changeFrequency: "monthly",
